@@ -26,11 +26,6 @@ jobs:
       - name: Generate SDK
         run: npm run sdk:generate
 
-      - name: Remove SDK prepare script
-        run: |
-          cd sdk
-          npm pkg delete scripts.prepare
-
       - name: Pack SDK
         run: |
           cd sdk
