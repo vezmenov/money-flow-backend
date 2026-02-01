@@ -10,6 +10,7 @@
     "build": "nest build",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write \"{src,test}/**/*.ts\"",
+    "sdk:generate": "openapi-generator-cli generate -i openapi.yaml -g typescript-angular -o sdk --additional-properties=ngVersion=17.3.0,npmName=money-flow-sdk,providedInRoot=true,apiModulePrefix=MoneyFlow",
     "test": "echo \"No tests configured\""
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^10.1.2",
     "@nestjs/testing": "^10.3.8",
+    "@openapitools/openapi-generator-cli": "^2.13.7",
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.30",
     "@typescript-eslint/eslint-plugin": "^7.6.0",

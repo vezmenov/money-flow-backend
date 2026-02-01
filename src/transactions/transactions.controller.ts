@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
@@ -27,6 +36,7 @@ export class TransactionsController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id') id: string): Promise<void> {
     return this.transactionsService.remove(id);
   }

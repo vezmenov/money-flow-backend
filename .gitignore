@@ -1,6 +1,7 @@
 node_modules
 /dist
 /data/database.sqlite
+/sdk
 .env
 .idea
 .vscode
