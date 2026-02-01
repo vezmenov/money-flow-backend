@@ -27,6 +27,26 @@ npm run sdk:generate
 
 The generated SDK is placed in `sdk/` and can be copied into the Angular repo.
 
+### CI/CD (GitHub Actions)
+This repo includes a workflow that generates the SDK and uploads a tarball artifact.
+
+1. Push changes to `openapi.yaml`.
+2. Download the `money-flow-sdk` artifact from the workflow run.
+3. Install it in the Angular repo:
+
+```bash
+npm install path/to/money-flow-sdk-*.tgz
+```
+
+### Auto-push to frontend repo
+The workflow can also push the SDK directly into the Angular repo:
+
+- Repo: `vezmenov/money-flow`
+- Path: `src/app/sdk`
+
+Add a `FRONTEND_TOKEN` secret (PAT with repo write access) to this backend repo.
+When the workflow runs, it replaces `src/app/sdk` and pushes to `main`.
+
 ## Scripts
 - `npm run start:dev` - start in watch mode
 - `npm run build` - build to `dist/`
