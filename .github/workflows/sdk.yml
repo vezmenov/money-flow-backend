@@ -59,6 +59,7 @@ jobs:
           tar -xzf ../sdk/*.tgz --strip-components=1 -C "${FRONTEND_SDK_PATH}"
           git config user.name "money-flow-bot"
           git config user.email "money-flow-bot@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${FRONTEND_TOKEN}@github.com/${FRONTEND_REPO}.git"
           git add "${FRONTEND_SDK_PATH}"
           if git diff --cached --quiet; then
             echo "No SDK changes to push."
