@@ -26,10 +26,15 @@ jobs:
       - name: Generate SDK
         run: npm run sdk:generate
 
+      - name: Install SDK dependencies
+        run: |
+          cd sdk
+          npm install
+
       - name: Pack SDK
         run: |
           cd sdk
-          npm pack --ignore-scripts
+          npm pack
 
       - name: Upload SDK artifact
         uses: actions/upload-artifact@v4
