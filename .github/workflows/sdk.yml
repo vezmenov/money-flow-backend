@@ -11,8 +11,6 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_IGNORE_SCRIPTS: 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,16 +26,10 @@ jobs:
       - name: Generate SDK
         run: npm run sdk:generate
 
-      - name: Remove SDK prepare script
-        run: |
-          cd sdk
-          npm pkg delete scripts.prepare
-          npm pkg delete scripts.build
-
       - name: Pack SDK
         run: |
           cd sdk
-          npm pack
+          npm pack --ignore-scripts
 
       - name: Upload SDK artifact
         uses: actions/upload-artifact@v4
