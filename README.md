@@ -38,6 +38,15 @@ This repo includes a workflow that generates the SDK and uploads a tarball artif
 npm install path/to/money-flow-sdk-*.tgz
 ```
 
+### Auto-push to frontend repo
+The workflow can also push the SDK directly into the Angular repo:
+
+- Repo: `vezmenov/money-flow`
+- Path: `src/app/sdk`
+
+Add a `FRONTEND_TOKEN` secret (PAT with repo write access) to this backend repo.
+When the workflow runs, it replaces `src/app/sdk` and pushes to `main`.
+
 ## Scripts
 - `npm run start:dev` - start in watch mode
 - `npm run build` - build to `dist/`
