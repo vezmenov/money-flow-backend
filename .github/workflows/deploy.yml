@@ -8,40 +8,30 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 30
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        env:
-          MF_REPO: https://github.com/vezmenov/money-flow.git
-          MF_BACKEND_REPO: https://github.com/vezmenov/money-flow-backend.git
-          MF_INFRA_REPO: https://github.com/vezmenov/money-flow-infra.git
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script_stop: true
-          envs: MF_REPO,MF_BACKEND_REPO,MF_INFRA_REPO
-          script: |
-            set -euo pipefail
+      - name: Sync repos and deploy
+        shell: bash
+        run: |
+          set -euo pipefail
 
-            sync_repo() {
-              local dir="$1"
-              local url="$2"
-              if [ ! -d "$dir/.git" ]; then
-                git clone "$url" "$dir"
-              fi
-              git -C "$dir" fetch origin main
-              git -C "$dir" checkout main
-              git -C "$dir" pull --ff-only origin main
-            }
+          sync_repo() {
+            local dir="$1"
+            local url="$2"
+            if [ ! -d "$dir/.git" ]; then
+              git clone "$url" "$dir"
+            fi
+            git -C "$dir" fetch origin main
+            git -C "$dir" checkout main
+            git -C "$dir" pull --ff-only origin main
+          }
 
-            mkdir -p "$HOME/apps"
-            sync_repo "$HOME/apps/money-flow" "$MF_REPO"
-            sync_repo "$HOME/apps/money-flow-backend" "$MF_BACKEND_REPO"
-            sync_repo "$HOME/apps/money-flow-infra" "$MF_INFRA_REPO"
+          mkdir -p "$HOME/apps"
+          sync_repo "$HOME/apps/money-flow" "https://github.com/vezmenov/money-flow.git"
+          sync_repo "$HOME/apps/money-flow-backend" "https://github.com/vezmenov/money-flow-backend.git"
+          sync_repo "$HOME/apps/money-flow-infra" "https://github.com/vezmenov/money-flow-infra.git"
 
-            cd "$HOME/apps/money-flow-infra"
-            docker compose up -d --build
-            docker compose ps
+          cd "$HOME/apps/money-flow-infra"
+          docker compose up -d --build
+          docker compose ps
