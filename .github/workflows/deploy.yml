@@ -32,6 +32,28 @@ jobs:
           sync_repo "$HOME/apps/money-flow-backend" "https://github.com/vezmenov/money-flow-backend.git"
           sync_repo "$HOME/apps/money-flow-infra" "https://github.com/vezmenov/money-flow-infra.git"
 
+          FRONTEND_SHA="$(git -C "$HOME/apps/money-flow" rev-parse --short HEAD)"
+          BACKEND_SHA="$(git -C "$HOME/apps/money-flow-backend" rev-parse --short HEAD)"
+          INFRA_SHA="$(git -C "$HOME/apps/money-flow-infra" rev-parse --short HEAD)"
+          BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          export APP_BUILD_VERSION="$FRONTEND_SHA"
+          export APP_BUILD_TIME="$BUILD_TIME"
+
+          echo "Deploying frontend build version: $APP_BUILD_VERSION"
+          echo "Build time (UTC): $APP_BUILD_TIME"
+
+          if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+            {
+              echo "### Deploy Info"
+              echo "- Frontend SHA: \`$FRONTEND_SHA\`"
+              echo "- Backend SHA: \`$BACKEND_SHA\`"
+              echo "- Infra SHA: \`$INFRA_SHA\`"
+              echo "- Frontend build version: \`$APP_BUILD_VERSION\`"
+              echo "- Build time (UTC): \`$APP_BUILD_TIME\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
           cd "$HOME/apps/money-flow-infra"
           docker compose up -d --build
           docker compose ps
