@@ -16,4 +16,3 @@ export class SettingsController {
     return this.settingsService.updateTimezone(payload.utcOffset);
   }
 }
-

@@ -11,12 +11,7 @@ import { RecurringProcessingState } from './recurring-processing-state.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      RecurringExpense,
-      RecurringProcessingState,
-      Category,
-      Transaction,
-    ]),
+    TypeOrmModule.forFeature([RecurringExpense, RecurringProcessingState, Category, Transaction]),
     SettingsModule,
   ],
   controllers: [RecurringExpensesController],
@@ -24,4 +19,3 @@ import { RecurringProcessingState } from './recurring-processing-state.entity';
   exports: [RecurringExpensesService],
 })
 export class RecurringExpensesModule {}
-

@@ -8,4 +8,3 @@ export class RecurringProcessingState {
   @Column({ type: 'date', nullable: true })
   lastProcessedDate?: string | null;
 }
-

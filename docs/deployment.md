@@ -3,7 +3,10 @@
 ## Как деплоится backend
 Деплой запускается GitHub Actions workflow `Deploy To Server` при пуше в ветку `main`.
 
-Workflow: `/Users/slave/FettrCode/money-flow-backend/.github/workflows/deploy.yml`
+Workflow: `.github/workflows/deploy.yml`
+
+Проверки (tests/docs/OpenAPI) гоняются в CI:
+- Workflow: `.github/workflows/ci.yml` (запускает `npm run check` на push/PR)
 
 На self-hosted раннере делается:
 - синк репозиториев `money-flow`, `money-flow-backend`, `money-flow-infra`

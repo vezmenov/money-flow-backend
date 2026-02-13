@@ -9,4 +9,3 @@ export class Settings {
   @Column({ type: 'varchar', length: 6, default: '+03:00' })
   utcOffset!: string;
 }
-

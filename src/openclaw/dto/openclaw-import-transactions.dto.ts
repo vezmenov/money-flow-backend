@@ -9,4 +9,3 @@ export class OpenClawImportTransactionsDto {
   @Type(() => OpenClawUpsertTransactionDto)
   transactions!: OpenClawUpsertTransactionDto[];
 }
-

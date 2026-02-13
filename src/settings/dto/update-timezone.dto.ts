@@ -5,4 +5,3 @@ export class UpdateTimezoneDto {
   @Length(1, 32)
   utcOffset!: string;
 }
-

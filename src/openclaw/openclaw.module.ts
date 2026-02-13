@@ -7,10 +7,7 @@ import { OpenClawController } from './openclaw.controller';
 import { OpenClawService } from './openclaw.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Category, Transaction]),
-    RecurringExpensesModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Category, Transaction]), RecurringExpensesModule],
   controllers: [OpenClawController],
   providers: [OpenClawService],
 })

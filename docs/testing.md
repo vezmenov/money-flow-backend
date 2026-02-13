@@ -6,6 +6,11 @@
 npm install
 ```
 
+Локальный quality gate (то что должно проходить всегда):
+```bash
+npm run check
+```
+
 Запуск тестов:
 ```bash
 npm test
@@ -15,6 +20,11 @@ Watch режим:
 ```bash
 npm run test:watch
 ```
+
+## Правило перед коммитом
+В репозитории включён `husky` pre-commit hook, который запускает `npm run check`.
+
+Если `check` не проходит, коммит блокируется.
 
 ## Что покрыто
 E2E тесты (через Nest Test + supertest, SQLite in-memory):
@@ -26,11 +36,21 @@ E2E тесты (через Nest Test + supertest, SQLite in-memory):
   - правило “31-е число” -> последний день месяца
 - OpenClaw:
   - recurring endpoints требуют `x-api-key`
+  - import transactions:
+    - 503 если `OPENCLAW_API_KEY` не задан
+    - 401 без ключа/с неверным ключом
+    - upsert по `(source="openclaw", idempotencyKey)`
+    - `GET/DELETE /api/openclaw/v1/transactions/:idempotencyKey`
+- основной API:
+  - CRUD категорий
+  - CRUD транзакций
+  - базовые валидации (например, количество знаков после запятой в `amount`)
 - парсер регулярных трат:
   - ручной вызов `processor.tick()` с зафиксированным временем
   - проверка что создаётся транзакция `source="recurring"` + корректный `idempotencyKey`
   - удаление регулярки не удаляет уже созданную транзакцию
 
-Файл тестов:
-- `/Users/slave/FettrCode/money-flow-backend/test/recurring-expenses.e2e.spec.ts`
-
+Файлы тестов:
+- `test/recurring-expenses.e2e.spec.ts`
+- `test/openclaw-import.e2e.spec.ts`
+- `test/api-crud.e2e.spec.ts`

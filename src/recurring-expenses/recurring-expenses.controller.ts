@@ -26,4 +26,3 @@ export class RecurringExpensesController {
     return this.recurringExpensesService.remove(id);
   }
 }
-

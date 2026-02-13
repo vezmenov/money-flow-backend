@@ -14,8 +14,8 @@
 - `DELETE /api/openclaw/v1/recurring-expenses/:id`
 
 Спека:
-- `/Users/slave/FettrCode/money-flow-backend/openapi.yaml`
-- `/Users/slave/FettrCode/money-flow-backend/openapi.openclaw.yaml`
+- `openapi.yaml`
+- `openapi.openclaw.yaml`
 
 ## Создание регулярной траты
 Request (`POST /recurring-expenses`):
@@ -85,4 +85,3 @@ Input formats для `PUT`:
 
 Ограничения:
 - это **offset**, а не IANA зона (DST не поддерживаем).
-

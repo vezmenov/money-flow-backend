@@ -50,17 +50,13 @@ export class OpenClawController {
   }
 
   @Get('transactions/:idempotencyKey')
-  async getTransaction(
-    @Param('idempotencyKey') idempotencyKey: string,
-  ): Promise<Transaction> {
+  async getTransaction(@Param('idempotencyKey') idempotencyKey: string): Promise<Transaction> {
     return this.openClawService.getTransactionByIdempotencyKey(idempotencyKey);
   }
 
   @Delete('transactions/:idempotencyKey')
   @HttpCode(204)
-  async removeTransaction(
-    @Param('idempotencyKey') idempotencyKey: string,
-  ): Promise<void> {
+  async removeTransaction(@Param('idempotencyKey') idempotencyKey: string): Promise<void> {
     return this.openClawService.removeTransactionByIdempotencyKey(idempotencyKey);
   }
 

@@ -1,11 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsDateString,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Length,
-} from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString, Length } from 'class-validator';
 
 export class OpenClawUpsertTransactionDto {
   @IsString()
@@ -28,4 +22,3 @@ export class OpenClawUpsertTransactionDto {
   @Length(0, 255)
   description?: string | null;
 }
-

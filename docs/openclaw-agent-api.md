@@ -13,10 +13,10 @@
 - Без ключа или с неверным ключом: `401`
 - Если `OPENCLAW_API_KEY` не задан: `503` (misconfig)
 
-Реализация: `/Users/slave/FettrCode/money-flow-backend/src/openclaw/guards/openclaw-api-key.guard.ts`
+Реализация: `src/openclaw/guards/openclaw-api-key.guard.ts`
 
 ## Эндпоинты
-Спека: `/Users/slave/FettrCode/money-flow-backend/openapi.openclaw.yaml`
+Спека: `openapi.openclaw.yaml`
 
 ### GET /health
 Возвращает `{ "status": "ok" }` при валидном ключе.
@@ -78,7 +78,7 @@ OpenClaw также публикует управление регулярным
 Важное отличие от импорта транзакций:
 - категория задаётся **строго по `categoryId`** (если нет - ошибка), автосоздания по имени тут нет
 
-Подробности: `/Users/slave/FettrCode/money-flow-backend/docs/recurring-expenses.md`
+Подробности: `docs/recurring-expenses.md`
 
 ## Данные / схема
 Изменения в `Transaction`:
@@ -86,7 +86,7 @@ OpenClaw также публикует управление регулярным
 - добавлено `idempotencyKey` (nullable)
 - добавлен unique индекс `(source, idempotencyKey)`
 
-Реализация: `/Users/slave/FettrCode/money-flow-backend/src/transactions/transaction.entity.ts`
+Реализация: `src/transactions/transaction.entity.ts`
 
 ## Операционные заметки
 - Если у вас уже есть SQLite база, TypeORM `synchronize: true` попытается добавить колонки/индексы автоматически.

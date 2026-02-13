@@ -33,4 +33,3 @@ export class CreateRecurringExpenseDto {
   @Length(0, 255)
   description?: string;
 }
-

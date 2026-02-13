@@ -142,4 +142,3 @@ function addDays(date: string, days: number): string {
 function daysInMonth(year: number, month1to12: number): number {
   return new Date(Date.UTC(year, month1to12, 0)).getUTCDate();
 }
-

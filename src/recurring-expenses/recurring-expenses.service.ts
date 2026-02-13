@@ -126,7 +126,12 @@ export class RecurringExpensesService {
       }
       const year = Number(match[1]);
       const month1to12 = Number(match[2]);
-      if (!Number.isInteger(year) || !Number.isInteger(month1to12) || month1to12 < 1 || month1to12 > 12) {
+      if (
+        !Number.isInteger(year) ||
+        !Number.isInteger(month1to12) ||
+        month1to12 < 1 ||
+        month1to12 > 12
+      ) {
         throw new BadRequestException('month must be in YYYY-MM format');
       }
       return { year, month1to12 };
@@ -169,4 +174,3 @@ function formatDate(year: number, month1to12: number, day: number): string {
 function daysInMonth(year: number, month1to12: number): number {
   return new Date(Date.UTC(year, month1to12, 0)).getUTCDate();
 }
-

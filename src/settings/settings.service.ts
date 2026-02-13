@@ -125,4 +125,3 @@ export function normalizeUtcOffset(input: string): string {
   const mm = String(minutes).padStart(2, '0');
   return `${sign}${hh}:${mm}`;
 }
-
