@@ -194,4 +194,119 @@ describe('OpenClaw import', () => {
     expect(got.amount).toBe(2);
     expect(got.description).toBe('B');
   });
+
+  it('returns 404 on GET for unknown idempotencyKey', async () => {
+    await request(app.getHttpServer())
+      .get('/api/openclaw/v1/transactions/unknown')
+      .set('x-api-key', 'devkey')
+      .expect(404);
+  });
+
+  it('validates idempotencyKey/categoryName after trim', async () => {
+    await request(app.getHttpServer())
+      .post('/api/openclaw/v1/transactions/import')
+      .set('x-api-key', 'devkey')
+      .send({
+        transactions: [
+          {
+            idempotencyKey: '   ',
+            amount: 1,
+            date: '2026-02-13',
+            categoryName: 'Food',
+          },
+        ],
+      })
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .post('/api/openclaw/v1/transactions/import')
+      .set('x-api-key', 'devkey')
+      .send({
+        transactions: [
+          {
+            idempotencyKey: 'openclaw:test:trim',
+            amount: 1,
+            date: '2026-02-13',
+            categoryName: '   ',
+          },
+        ],
+      })
+      .expect(400);
+  });
+
+  it('does not overwrite description when description is omitted', async () => {
+    const idempotencyKey = 'openclaw:test:desc';
+
+    await request(app.getHttpServer())
+      .post('/api/openclaw/v1/transactions/import')
+      .set('x-api-key', 'devkey')
+      .send({
+        transactions: [
+          {
+            idempotencyKey,
+            amount: 1,
+            date: '2026-02-13',
+            categoryName: 'Food',
+            description: 'A',
+          },
+        ],
+      })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .post('/api/openclaw/v1/transactions/import')
+      .set('x-api-key', 'devkey')
+      .send({
+        transactions: [
+          {
+            idempotencyKey,
+            amount: 2,
+            date: '2026-02-13',
+            categoryName: 'Food',
+          },
+        ],
+      })
+      .expect(200);
+
+    const got = await request(app.getHttpServer())
+      .get(`/api/openclaw/v1/transactions/${encodeURIComponent(idempotencyKey)}`)
+      .set('x-api-key', 'devkey')
+      .expect(200)
+      .then((r) => r.body as any);
+
+    expect(got.amount).toBe(2);
+    expect(got.description).toBe('A');
+  });
+
+  it('GET /categories returns unique categories (case-insensitive)', async () => {
+    await request(app.getHttpServer())
+      .post('/api/openclaw/v1/transactions/import')
+      .set('x-api-key', 'devkey')
+      .send({
+        transactions: [
+          {
+            idempotencyKey: 'openclaw:test:cat:1',
+            amount: 1,
+            date: '2026-02-13',
+            categoryName: 'Food',
+          },
+          {
+            idempotencyKey: 'openclaw:test:cat:2',
+            amount: 1,
+            date: '2026-02-13',
+            categoryName: 'food',
+          },
+        ],
+      })
+      .expect(200);
+
+    const categories = await request(app.getHttpServer())
+      .get('/api/openclaw/v1/categories')
+      .set('x-api-key', 'devkey')
+      .expect(200)
+      .then((r) => r.body as any[]);
+
+    expect(categories).toHaveLength(1);
+    expect(categories[0].name).toBe('Food');
+  });
 });

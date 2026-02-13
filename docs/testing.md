@@ -41,13 +41,19 @@ E2E тесты (через Nest Test + supertest, SQLite in-memory):
     - 401 без ключа/с неверным ключом
     - upsert по `(source="openclaw", idempotencyKey)`
     - `GET/DELETE /api/openclaw/v1/transactions/:idempotencyKey`
+    - валидация `idempotencyKey`/`categoryName` после `trim()`
+    - `description` не затирается, если поле не прислали
+    - `GET /api/openclaw/v1/categories` не плодит дубли (case-insensitive)
 - основной API:
   - CRUD категорий
   - CRUD транзакций
   - базовые валидации (например, количество знаков после запятой в `amount`)
+  - 404 на update/delete несуществующих сущностей
 - парсер регулярных трат:
   - ручной вызов `processor.tick()` с зафиксированным временем
   - проверка что создаётся транзакция `source="recurring"` + корректный `idempotencyKey`
+  - правило “31-е число” работает и для коммита в короткий месяц
+  - догонялка по `lastProcessedDate` создаёт транзакции за пропущенные дни
   - удаление регулярки не удаляет уже созданную транзакцию
 
 Файлы тестов:

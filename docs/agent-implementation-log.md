@@ -113,3 +113,9 @@
     - `scripts/check-docs.cjs`
     - `.github/workflows/ci.yml`
     - `package.json`
+
+19. Усилены e2e тесты edge-case сценариями (валидации/404/догонялка парсера).
+    Файлы:
+    - `test/recurring-expenses.e2e.spec.ts`
+    - `test/openclaw-import.e2e.spec.ts`
+    - `test/api-crud.e2e.spec.ts`

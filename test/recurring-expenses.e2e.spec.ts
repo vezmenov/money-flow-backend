@@ -119,6 +119,34 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
       });
   });
 
+  it('validates recurring creation (category must exist, dayOfMonth must match date)', async () => {
+    await request(app.getHttpServer())
+      .post('/api/recurring-expenses')
+      .send({
+        categoryId: '00000000-0000-0000-0000-000000000000',
+        amount: 10,
+        dayOfMonth: 13,
+        date: '2026-02-13',
+      })
+      .expect(400);
+
+    const category = await request(app.getHttpServer())
+      .post('/api/categories')
+      .send({ name: 'Test' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    await request(app.getHttpServer())
+      .post('/api/recurring-expenses')
+      .send({
+        categoryId: category.id,
+        amount: 10,
+        dayOfMonth: 12,
+        date: '2026-02-13',
+      })
+      .expect(400);
+  });
+
   it('OpenClaw recurring endpoints require x-api-key', async () => {
     await request(app.getHttpServer())
       .get('/api/openclaw/v1/recurring-expenses')
@@ -130,6 +158,37 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
       .set('x-api-key', 'devkey')
       .query({ month: '2026-02' })
       .expect(200);
+  });
+
+  it('list for month validates YYYY-MM and excludes recurring that have not started yet', async () => {
+    const category = await request(app.getHttpServer())
+      .post('/api/categories')
+      .send({ name: 'Future' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    await request(app.getHttpServer())
+      .post('/api/recurring-expenses')
+      .send({
+        categoryId: category.id,
+        amount: 10,
+        dayOfMonth: 13,
+        date: '2026-03-13',
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .get('/api/recurring-expenses')
+      .query({ month: '2026-02' })
+      .expect(200)
+      .then((r) => {
+        expect(r.body).toEqual([]);
+      });
+
+    await request(app.getHttpServer())
+      .get('/api/recurring-expenses')
+      .query({ month: '2026/02' })
+      .expect(400);
   });
 
   it('processor commits a recurring transaction at end-of-day and list shows committed', async () => {
@@ -199,6 +258,131 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
     expect(
       txsAfterDelete.some((t) => t.source === 'recurring' && t.idempotencyKey === expectedKey),
     ).toBe(true);
+  });
+
+  it('processor shifts 31st to the last day of shorter months when committing', async () => {
+    await request(app.getHttpServer())
+      .put('/api/settings/timezone')
+      .send({ utcOffset: '+00:00' })
+      .expect(200);
+
+    const category = await request(app.getHttpServer())
+      .post('/api/categories')
+      .send({ name: 'Bills' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const recurring = await request(app.getHttpServer())
+      .post('/api/recurring-expenses')
+      .send({
+        categoryId: category.id,
+        amount: 1,
+        dayOfMonth: 31,
+        date: '2026-01-31',
+        description: 'Edge case commit',
+      })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const processor = app.get(RecurringExpensesProcessor);
+
+    const originalNow = Date.now;
+    Date.now = () => new Date('2026-02-28T23:56:00.000Z').getTime();
+    try {
+      await processor.tick();
+    } finally {
+      Date.now = originalNow;
+    }
+
+    const expectedKey = recurringTransactionIdempotencyKey(recurring.id, '2026-02-28');
+    const txs = await request(app.getHttpServer())
+      .get('/api/transactions')
+      .expect(200)
+      .then((r) => r.body as any[]);
+
+    expect(txs.some((t) => t.source === 'recurring' && t.idempotencyKey === expectedKey)).toBe(
+      true,
+    );
+  });
+
+  it('processor catches up missed days using lastProcessedDate', async () => {
+    await request(app.getHttpServer())
+      .put('/api/settings/timezone')
+      .send({ utcOffset: '+00:00' })
+      .expect(200);
+
+    const category = await request(app.getHttpServer())
+      .post('/api/categories')
+      .send({ name: 'Catchup' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const recurring11 = await request(app.getHttpServer())
+      .post('/api/recurring-expenses')
+      .send({
+        categoryId: category.id,
+        amount: 11,
+        dayOfMonth: 11,
+        date: '2026-01-11',
+      })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const recurring12 = await request(app.getHttpServer())
+      .post('/api/recurring-expenses')
+      .send({
+        categoryId: category.id,
+        amount: 12,
+        dayOfMonth: 12,
+        date: '2026-01-12',
+      })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const recurring13 = await request(app.getHttpServer())
+      .post('/api/recurring-expenses')
+      .send({
+        categoryId: category.id,
+        amount: 13,
+        dayOfMonth: 13,
+        date: '2026-01-13',
+      })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    await dataSource.getRepository(RecurringProcessingState).save({
+      id: 1,
+      lastProcessedDate: '2026-02-10',
+    });
+
+    const processor = app.get(RecurringExpensesProcessor);
+
+    const originalNow = Date.now;
+    Date.now = () => new Date('2026-02-13T23:56:00.000Z').getTime();
+    try {
+      await processor.tick();
+    } finally {
+      Date.now = originalNow;
+    }
+
+    const txs = await request(app.getHttpServer())
+      .get('/api/transactions')
+      .expect(200)
+      .then((r) => r.body as any[]);
+
+    const keys = txs.filter((t) => t.source === 'recurring').map((t) => t.idempotencyKey);
+
+    const expectedKeys = [
+      recurringTransactionIdempotencyKey(recurring11.id, '2026-02-11'),
+      recurringTransactionIdempotencyKey(recurring12.id, '2026-02-12'),
+      recurringTransactionIdempotencyKey(recurring13.id, '2026-02-13'),
+    ];
+
+    expect(keys).toHaveLength(3);
+    expect(keys).toEqual(expect.arrayContaining(expectedKeys));
+
+    const state = await dataSource.getRepository(RecurringProcessingState).findOneBy({ id: 1 });
+    expect(state?.lastProcessedDate).toBe('2026-02-13');
   });
 
   it('dayOfMonth=31 shifts to last day of shorter months in listing', async () => {

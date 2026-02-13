@@ -89,6 +89,17 @@ describe('API CRUD (categories/transactions)', () => {
     expect(listAfter.map((c) => c.name)).toEqual(['AA']);
   });
 
+  it('categories: 404 on update/delete missing id', async () => {
+    await request(app.getHttpServer())
+      .put('/api/categories/00000000-0000-0000-0000-000000000000')
+      .send({ name: 'X' })
+      .expect(404);
+
+    await request(app.getHttpServer())
+      .delete('/api/categories/00000000-0000-0000-0000-000000000000')
+      .expect(404);
+  });
+
   it('transactions: create/list/update/delete + validation', async () => {
     const category = await request(app.getHttpServer())
       .post('/api/categories')
@@ -115,7 +126,10 @@ describe('API CRUD (categories/transactions)', () => {
         description: 'Older',
       })
       .expect(201)
-      .then((r) => r.body as { id: string });
+      .then((r) => r.body as { id: string; source: string; idempotencyKey?: string | null });
+
+    expect(created1.source).toBe('manual');
+    expect(created1.idempotencyKey ?? null).toBeNull();
 
     const created2 = await request(app.getHttpServer())
       .post('/api/transactions')
@@ -154,5 +168,16 @@ describe('API CRUD (categories/transactions)', () => {
       .then((r) => r.body as Array<{ id: string }>);
 
     expect(listAfter.map((t) => t.id)).toEqual([created2.id]);
+  });
+
+  it('transactions: 404 on update/delete missing id', async () => {
+    await request(app.getHttpServer())
+      .put('/api/transactions/00000000-0000-0000-0000-000000000000')
+      .send({ amount: 1 })
+      .expect(404);
+
+    await request(app.getHttpServer())
+      .delete('/api/transactions/00000000-0000-0000-0000-000000000000')
+      .expect(404);
   });
 });
