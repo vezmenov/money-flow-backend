@@ -14,6 +14,11 @@ All routes are prefixed with `/api`.
 - `POST /api/transactions`
 - `PUT /api/transactions/:id`
 - `DELETE /api/transactions/:id`
+- `GET /api/recurring-expenses`
+- `POST /api/recurring-expenses`
+- `DELETE /api/recurring-expenses/:id`
+- `GET /api/settings/timezone`
+- `PUT /api/settings/timezone`
 
 ## OpenClaw Agent API
 All routes are prefixed with `/api/openclaw/v1` and require `x-api-key`.
@@ -27,6 +32,9 @@ Routes:
 - `POST /api/openclaw/v1/transactions/import`
 - `GET /api/openclaw/v1/transactions/:idempotencyKey`
 - `DELETE /api/openclaw/v1/transactions/:idempotencyKey`
+- `GET /api/openclaw/v1/recurring-expenses`
+- `POST /api/openclaw/v1/recurring-expenses`
+- `DELETE /api/openclaw/v1/recurring-expenses/:id`
 
 Spec:
 - Frontend: `openapi.yaml`

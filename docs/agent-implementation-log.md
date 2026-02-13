@@ -57,3 +57,34 @@
 
 11. Деплой делается пушем в `main` (GitHub Actions workflow на self-hosted раннере).
     Док: `/Users/slave/FettrCode/money-flow-backend/docs/deployment.md`
+
+12. Добавлены настройки таймзоны (UTC offset) в БД + API:
+    - `GET/PUT /api/settings/timezone`
+    Файлы:
+    - `/Users/slave/FettrCode/money-flow-backend/src/settings/settings.entity.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/src/settings/settings.service.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/src/settings/settings.controller.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/src/settings/settings.module.ts`
+
+13. Добавлены регулярные траты (monthly) + API:
+    - основной контур: `/api/recurring-expenses`
+    - OpenClaw контур: `/api/openclaw/v1/recurring-expenses`
+    Файлы:
+    - `/Users/slave/FettrCode/money-flow-backend/src/recurring-expenses/recurring-expense.entity.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/src/recurring-expenses/recurring-expenses.service.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/src/recurring-expenses/recurring-expenses.controller.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/src/recurring-expenses/recurring-expenses.module.ts`
+
+14. Добавлен фоновый парсер регулярных трат (schedule job) с догонялкой:
+    - state: `lastProcessedDate`
+    - запуск каждые 5 минут, “конец дня” 23:55 по utcOffset
+    - генерация транзакций `source="recurring"` + idempotencyKey
+    Файлы:
+    - `/Users/slave/FettrCode/money-flow-backend/src/recurring-expenses/recurring-processing-state.entity.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/src/recurring-expenses/recurring-expenses.processor.ts`
+
+15. Обновлена OpenAPI документация и внутренний док по регуляркам.
+    Файлы:
+    - `/Users/slave/FettrCode/money-flow-backend/openapi.yaml`
+    - `/Users/slave/FettrCode/money-flow-backend/openapi.openclaw.yaml`
+    - `/Users/slave/FettrCode/money-flow-backend/docs/recurring-expenses.md`

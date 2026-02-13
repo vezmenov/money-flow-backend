@@ -69,6 +69,17 @@ Response:
 ### DELETE /transactions/:idempotencyKey
 Удаляет только импортированную агентом транзакцию (source=openclaw).
 
+### Регулярные траты
+OpenClaw также публикует управление регулярными тратами (monthly) под тем же префиксом:
+- `GET /recurring-expenses?month=YYYY-MM`
+- `POST /recurring-expenses`
+- `DELETE /recurring-expenses/:id`
+
+Важное отличие от импорта транзакций:
+- категория задаётся **строго по `categoryId`** (если нет - ошибка), автосоздания по имени тут нет
+
+Подробности: `/Users/slave/FettrCode/money-flow-backend/docs/recurring-expenses.md`
+
 ## Данные / схема
 Изменения в `Transaction`:
 - добавлено `source` (default: `manual`)

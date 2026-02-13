@@ -15,3 +15,9 @@ Workflow: `/Users/slave/FettrCode/money-flow-backend/.github/workflows/deploy.ym
 
 Если `OPENCLAW_API_KEY` не задан, OpenClaw endpoints будут отвечать `503` (misconfig).
 
+## Важно для регулярных трат
+Парсер регулярных трат запускается внутри backend (schedule job) и создаёт транзакции автоматически.
+
+Таймзона считается по настройке `utcOffset` в БД:
+- дефолт: `+03:00`
+- меняется через `PUT /api/settings/timezone`

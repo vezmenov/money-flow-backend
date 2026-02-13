@@ -93,6 +93,63 @@ paths:
           description: Unauthorized
         '404':
           description: Not Found
+  /recurring-expenses:
+    get:
+      summary: List recurring expenses for a month
+      parameters:
+        - in: query
+          name: month
+          required: false
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecurringExpenseForMonth'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create recurring expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecurringExpense'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringExpense'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+  /recurring-expenses/{id}:
+    delete:
+      summary: Delete recurring expense
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
 components:
   securitySchemes:
     OpenClawApiKey:
@@ -199,4 +256,86 @@ components:
             $ref: '#/components/schemas/OpenClawImportResult'
       required:
         - results
-
+    RecurringExpense:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        dayOfMonth:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+          nullable: true
+      required:
+        - id
+        - categoryId
+        - amount
+        - dayOfMonth
+        - date
+    CreateRecurringExpense:
+      type: object
+      properties:
+        categoryId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        dayOfMonth:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+      required:
+        - categoryId
+        - amount
+        - dayOfMonth
+        - date
+    RecurringExpenseForMonth:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        dayOfMonth:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+          nullable: true
+        scheduledDate:
+          type: string
+          format: date
+        committed:
+          type: boolean
+      required:
+        - id
+        - categoryId
+        - amount
+        - dayOfMonth
+        - date
+        - scheduledDate
+        - committed

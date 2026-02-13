@@ -6,9 +6,17 @@ import {
   HttpCode,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Category } from '../categories/category.entity';
+import { CreateRecurringExpenseDto } from '../recurring-expenses/dto/create-recurring-expense.dto';
+import { ListRecurringExpensesQueryDto } from '../recurring-expenses/dto/list-recurring-expenses.dto';
+import { RecurringExpense } from '../recurring-expenses/recurring-expense.entity';
+import {
+  RecurringExpenseForMonth,
+  RecurringExpensesService,
+} from '../recurring-expenses/recurring-expenses.service';
 import { Transaction } from '../transactions/transaction.entity';
 import { OpenClawImportTransactionsDto } from './dto/openclaw-import-transactions.dto';
 import { OpenClawApiKeyGuard } from './guards/openclaw-api-key.guard';
@@ -17,7 +25,10 @@ import { OpenClawImportResult, OpenClawService } from './openclaw.service';
 @Controller('openclaw/v1')
 @UseGuards(OpenClawApiKeyGuard)
 export class OpenClawController {
-  constructor(private readonly openClawService: OpenClawService) {}
+  constructor(
+    private readonly openClawService: OpenClawService,
+    private readonly recurringExpensesService: RecurringExpensesService,
+  ) {}
 
   @Get('health')
   getHealth(): { status: string } {
@@ -51,5 +62,25 @@ export class OpenClawController {
     @Param('idempotencyKey') idempotencyKey: string,
   ): Promise<void> {
     return this.openClawService.removeTransactionByIdempotencyKey(idempotencyKey);
+  }
+
+  @Get('recurring-expenses')
+  async listRecurringExpenses(
+    @Query() query: ListRecurringExpensesQueryDto,
+  ): Promise<RecurringExpenseForMonth[]> {
+    return this.recurringExpensesService.listForMonth(query.month);
+  }
+
+  @Post('recurring-expenses')
+  async createRecurringExpense(
+    @Body() payload: CreateRecurringExpenseDto,
+  ): Promise<RecurringExpense> {
+    return this.recurringExpensesService.create(payload);
+  }
+
+  @Delete('recurring-expenses/:id')
+  @HttpCode(204)
+  async removeRecurringExpense(@Param('id') id: string): Promise<void> {
+    return this.recurringExpensesService.remove(id);
   }
 }
