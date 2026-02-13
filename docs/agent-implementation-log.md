@@ -88,3 +88,10 @@
     - `/Users/slave/FettrCode/money-flow-backend/openapi.yaml`
     - `/Users/slave/FettrCode/money-flow-backend/openapi.openclaw.yaml`
     - `/Users/slave/FettrCode/money-flow-backend/docs/recurring-expenses.md`
+
+16. Добавлена базовая тестовая инфраструктура (Jest + ts-jest + supertest) и e2e-тесты для timezone/recurring/OpenClaw.
+    Файлы:
+    - `/Users/slave/FettrCode/money-flow-backend/jest.config.cjs`
+    - `/Users/slave/FettrCode/money-flow-backend/tsconfig.spec.json`
+    - `/Users/slave/FettrCode/money-flow-backend/test/recurring-expenses.e2e.spec.ts`
+    - `/Users/slave/FettrCode/money-flow-backend/docs/testing.md`
