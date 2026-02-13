@@ -15,6 +15,41 @@ All routes are prefixed with `/api`.
 - `PUT /api/transactions/:id`
 - `DELETE /api/transactions/:id`
 
+## OpenClaw Agent API
+All routes are prefixed with `/api/openclaw/v1` and require `x-api-key`.
+
+Env:
+- `OPENCLAW_API_KEY` - shared secret for agent access
+
+Routes:
+- `GET /api/openclaw/v1/health`
+- `GET /api/openclaw/v1/categories`
+- `POST /api/openclaw/v1/transactions/import`
+- `GET /api/openclaw/v1/transactions/:idempotencyKey`
+- `DELETE /api/openclaw/v1/transactions/:idempotencyKey`
+
+Spec:
+- Frontend: `openapi.yaml`
+- OpenClaw: `openapi.openclaw.yaml`
+
+Example import:
+```bash
+curl -X POST "http://localhost:3000/api/openclaw/v1/transactions/import" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $OPENCLAW_API_KEY" \
+  -d '{
+    "transactions": [
+      {
+        "idempotencyKey": "openclaw:receipt:2026-02-13:abc123",
+        "amount": 123.45,
+        "date": "2026-02-13",
+        "categoryName": "Food",
+        "description": "Store XYZ"
+      }
+    ]
+  }'
+```
+
 ## Database
 Uses SQLite at `data/database.sqlite` with TypeORM auto sync enabled for local development.
 

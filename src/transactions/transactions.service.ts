@@ -15,6 +15,7 @@ export class TransactionsService {
   async create(payload: CreateTransactionDto): Promise<Transaction> {
     const transaction = this.transactionRepository.create({
       ...payload,
+      source: 'manual',
     });
     return this.transactionRepository.save(transaction);
   }

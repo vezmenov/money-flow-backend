@@ -1,10 +1,26 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Category } from '../categories/category.entity';
 
+@Index('IDX_transactions_source_idempotencyKey', ['source', 'idempotencyKey'], {
+  unique: true,
+})
 @Entity('transactions')
 export class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
+
+  @Column({ type: 'varchar', length: 32, default: 'manual' })
+  source!: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  idempotencyKey?: string | null;
 
   @Column({ type: 'uuid' })
   categoryId!: string;
