@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { AlertsService } from '../alerts/alerts.service';
 import { JobLocksService } from '../job-locks/job-locks.service';
 import { SettingsService } from '../settings/settings.service';
 import { Transaction } from '../transactions/transaction.entity';
@@ -22,6 +23,7 @@ export class RecurringExpensesProcessor {
     private readonly transactionRepository: Repository<Transaction>,
     private readonly settingsService: SettingsService,
     private readonly jobLocksService: JobLocksService,
+    private readonly alertsService: AlertsService,
   ) {}
 
   @Cron('*/5 * * * *')
@@ -37,33 +39,38 @@ export class RecurringExpensesProcessor {
 
     this.running = true;
     try {
-      const offsetMinutes = await this.settingsService.getUtcOffsetMinutes();
-      const localNow = new Date(Date.now() + offsetMinutes * 60_000);
+      try {
+        const offsetMinutes = await this.settingsService.getUtcOffsetMinutes();
+        const localNow = new Date(Date.now() + offsetMinutes * 60_000);
 
-      const localHour = localNow.getUTCHours();
-      const localMinute = localNow.getUTCMinutes();
-      const localDate = formatDateFromUtcDate(localNow);
+        const localHour = localNow.getUTCHours();
+        const localMinute = localNow.getUTCMinutes();
+        const localDate = formatDateFromUtcDate(localNow);
 
-      const processToday = localHour > 23 || (localHour === 23 && localMinute >= 55);
-      const maxDateToProcess = processToday ? localDate : addDays(localDate, -1);
+        const processToday = localHour > 23 || (localHour === 23 && localMinute >= 55);
+        const maxDateToProcess = processToday ? localDate : addDays(localDate, -1);
 
-      // When it's early and we have nothing to process yet (e.g. first run before end-of-day),
-      // maxDateToProcess can still be a valid date (yesterday). We'll handle it normally.
-      const state = await this.ensureStateRow();
-      const startDate = state.lastProcessedDate
-        ? addDays(state.lastProcessedDate, 1)
-        : maxDateToProcess;
+        // When it's early and we have nothing to process yet (e.g. first run before end-of-day),
+        // maxDateToProcess can still be a valid date (yesterday). We'll handle it normally.
+        const state = await this.ensureStateRow();
+        const startDate = state.lastProcessedDate
+          ? addDays(state.lastProcessedDate, 1)
+          : maxDateToProcess;
 
-      if (startDate > maxDateToProcess) {
-        return;
+        if (startDate > maxDateToProcess) {
+          return;
+        }
+
+        for (let d = startDate; d <= maxDateToProcess; d = addDays(d, 1)) {
+          await this.processDate(d);
+        }
+
+        state.lastProcessedDate = maxDateToProcess;
+        await this.stateRepository.save(state);
+      } catch (err) {
+        await this.alertsService.alert(`Recurring expenses processor failed: ${String(err)}`);
+        throw err;
       }
-
-      for (let d = startDate; d <= maxDateToProcess; d = addDays(d, 1)) {
-        await this.processDate(d);
-      }
-
-      state.lastProcessedDate = maxDateToProcess;
-      await this.stateRepository.save(state);
     } finally {
       this.running = false;
     }

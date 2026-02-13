@@ -46,6 +46,14 @@ SQLite база по умолчанию: `data/database.sqlite`.
 - `GET /api/backup/sqlite` (нужен `APP_API_KEY`)
 Док: `docs/backups.md`
 
+## Readiness / алерты
+Readiness probe (публично, без ключа):
+- `GET /api/ready` (делает DB ping)
+
+Опциональные Telegram алерты (если заданы env, иначе просто лог):
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_CHAT_ID`
+
 ## Важно для регулярных трат
 Парсер регулярных трат запускается внутри backend (schedule job) и создаёт транзакции автоматически.
 

@@ -23,6 +23,22 @@ paths:
                     type: string
                 required:
                   - status
+  /ready:
+    get:
+      summary: Readiness check (DB ping)
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required:
+                  - status
   /categories:
     get:
       summary: List categories

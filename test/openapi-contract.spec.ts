@@ -8,6 +8,7 @@ describe('OpenAPI contract (must cover implemented API)', () => {
 
     const paths = Object.keys(spec.paths ?? {});
     expect(paths).toEqual(expect.arrayContaining(['/health']));
+    expect(paths).toEqual(expect.arrayContaining(['/ready']));
     expect(paths).toEqual(expect.arrayContaining(['/categories', '/categories/{id}']));
     expect(paths).toEqual(expect.arrayContaining(['/transactions', '/transactions/{id}']));
     expect(paths).toEqual(

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AlertsModule } from '../alerts/alerts.module';
 import { Category } from '../categories/category.entity';
 import { JobLocksModule } from '../job-locks/job-locks.module';
 import { SettingsModule } from '../settings/settings.module';
@@ -15,6 +16,7 @@ import { RecurringProcessingState } from './recurring-processing-state.entity';
     TypeOrmModule.forFeature([RecurringExpense, RecurringProcessingState, Category, Transaction]),
     SettingsModule,
     JobLocksModule,
+    AlertsModule,
   ],
   controllers: [RecurringExpensesController],
   providers: [RecurringExpensesService, RecurringExpensesProcessor],

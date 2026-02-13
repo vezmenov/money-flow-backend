@@ -214,3 +214,24 @@
     - `docs/deployment.md`
     - `scripts/check-docs.cjs`
     - `test/backup-sqlite.e2e.spec.ts`
+
+28. Добавлены базовые “наблюдаемость + алерты”:
+    - `GET /api/ready` (DB ping) как readiness probe
+    - request logging middleware + `x-request-id`
+    - `AlertsService`: всегда логирует, Telegram-уведомления если заданы `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`
+    - recurring/backup cron шлют alert при ошибках
+    Файлы:
+    - `src/app.controller.ts`
+    - `src/app.service.ts`
+    - `src/common/request-logger.middleware.ts`
+    - `src/main.ts`
+    - `src/alerts/alerts.service.ts`
+    - `src/alerts/alerts.module.ts`
+    - `src/recurring-expenses/recurring-expenses.processor.ts`
+    - `src/recurring-expenses/recurring-expenses.module.ts`
+    - `src/backups/backups.processor.ts`
+    - `src/backups/backups.module.ts`
+    - `openapi.yaml`
+    - `docs/deployment.md`
+    - `test/health-ready.e2e.spec.ts`
+    - `test/alerts.service.spec.ts`
