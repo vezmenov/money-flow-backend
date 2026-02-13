@@ -55,8 +55,15 @@ E2E тесты (через Nest Test + supertest, SQLite in-memory):
   - правило “31-е число” работает и для коммита в короткий месяц
   - догонялка по `lastProcessedDate` создаёт транзакции за пропущенные дни
   - удаление регулярки не удаляет уже созданную транзакцию
+- unit/integration:
+  - нормализация/парсинг `utcOffset`
+  - уникальность индекса `(source, idempotencyKey)` в БД
+  - smoke проверки, что OpenAPI спеки содержат нужные paths
 
 Файлы тестов:
 - `test/recurring-expenses.e2e.spec.ts`
 - `test/openclaw-import.e2e.spec.ts`
 - `test/api-crud.e2e.spec.ts`
+- `test/settings-utc-offset.spec.ts`
+- `test/transaction-idempotency-index.spec.ts`
+- `test/openapi-contract.spec.ts`

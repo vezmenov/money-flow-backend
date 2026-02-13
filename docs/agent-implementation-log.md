@@ -119,3 +119,12 @@
     - `test/recurring-expenses.e2e.spec.ts`
     - `test/openclaw-import.e2e.spec.ts`
     - `test/api-crud.e2e.spec.ts`
+
+20. Добавлены unit/integration/contract тесты:
+    - unit: нормализация/парсинг `utcOffset`
+    - integration: уникальный индекс `(source, idempotencyKey)` на SQLite
+    - contract: OpenAPI спеки содержат ключевые paths/схемы
+    Файлы:
+    - `test/settings-utc-offset.spec.ts`
+    - `test/transaction-idempotency-index.spec.ts`
+    - `test/openapi-contract.spec.ts`

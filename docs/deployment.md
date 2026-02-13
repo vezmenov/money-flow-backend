@@ -5,8 +5,9 @@
 
 Workflow: `.github/workflows/deploy.yml`
 
-Проверки (tests/docs/OpenAPI) гоняются в CI:
+Проверки (tests/docs/OpenAPI) гоняются:
 - Workflow: `.github/workflows/ci.yml` (запускает `npm run check` на push/PR)
+- И прямо в деплое: `.github/workflows/deploy.yml` сначала гоняет `npm run check`, и только потом делает `docker compose up`
 
 На self-hosted раннере делается:
 - синк репозиториев `money-flow`, `money-flow-backend`, `money-flow-infra`
