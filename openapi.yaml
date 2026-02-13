@@ -88,9 +88,57 @@ paths:
   /transactions:
     get:
       summary: List transactions
+      parameters:
+        - in: query
+          name: from
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Start date (inclusive)
+        - in: query
+          name: to
+          required: false
+          schema:
+            type: string
+            format: date
+          description: End date (inclusive)
+        - in: query
+          name: categoryId
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: source
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 500
+          description: Pagination limit (default 100)
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+          description: Pagination offset (default 0)
       responses:
         '200':
           description: OK
+          headers:
+            X-Total-Count:
+              description: Total number of transactions matching the filter (before pagination)
+              schema:
+                type: integer
           content:
             application/json:
               schema:

@@ -170,6 +170,7 @@ describe('API CRUD (categories/transactions)', () => {
     const list = await request(app.getHttpServer())
       .get('/api/transactions')
       .set('x-api-key', apiKey)
+      .expect('X-Total-Count', '2')
       .expect(200)
       .then((r) => r.body as Array<{ id: string; date: string }>);
 
@@ -199,6 +200,81 @@ describe('API CRUD (categories/transactions)', () => {
       .then((r) => r.body as Array<{ id: string }>);
 
     expect(listAfter.map((t) => t.id)).toEqual([created2.id]);
+  });
+
+  it('transactions: list supports pagination and filters', async () => {
+    const category = await request(app.getHttpServer())
+      .post('/api/categories')
+      .set('x-api-key', apiKey)
+      .send({ name: 'Food' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const tx1 = await request(app.getHttpServer())
+      .post('/api/transactions')
+      .set('x-api-key', apiKey)
+      .send({ categoryId: category.id, amount: 1, date: '2026-02-10' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const tx2 = await request(app.getHttpServer())
+      .post('/api/transactions')
+      .set('x-api-key', apiKey)
+      .send({ categoryId: category.id, amount: 2, date: '2026-02-11' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const tx3 = await request(app.getHttpServer())
+      .post('/api/transactions')
+      .set('x-api-key', apiKey)
+      .send({ categoryId: category.id, amount: 3, date: '2026-02-12' })
+      .expect(201)
+      .then((r) => r.body as { id: string });
+
+    const page1 = await request(app.getHttpServer())
+      .get('/api/transactions')
+      .set('x-api-key', apiKey)
+      .query({ limit: 1, offset: 0 })
+      .expect(200)
+      .then((r) => ({ body: r.body as Array<{ id: string }>, total: r.headers['x-total-count'] }));
+
+    expect(page1.total).toBe('3');
+    expect(page1.body.map((t) => t.id)).toEqual([tx3.id]);
+
+    const page2 = await request(app.getHttpServer())
+      .get('/api/transactions')
+      .set('x-api-key', apiKey)
+      .query({ limit: 1, offset: 1 })
+      .expect(200)
+      .then((r) => ({ body: r.body as Array<{ id: string }>, total: r.headers['x-total-count'] }));
+
+    expect(page2.total).toBe('3');
+    expect(page2.body.map((t) => t.id)).toEqual([tx2.id]);
+
+    const filtered = await request(app.getHttpServer())
+      .get('/api/transactions')
+      .set('x-api-key', apiKey)
+      .query({ from: '2026-02-11', to: '2026-02-12' })
+      .expect(200)
+      .then((r) => ({ body: r.body as Array<{ id: string }>, total: r.headers['x-total-count'] }));
+
+    expect(filtered.total).toBe('2');
+    expect(filtered.body.map((t) => t.id)).toEqual([tx3.id, tx2.id]);
+
+    const byCategory = await request(app.getHttpServer())
+      .get('/api/transactions')
+      .set('x-api-key', apiKey)
+      .query({ categoryId: category.id })
+      .expect(200)
+      .then((r) => r.body as Array<{ id: string }>);
+
+    expect(byCategory.map((t) => t.id)).toEqual([tx3.id, tx2.id, tx1.id]);
+
+    await request(app.getHttpServer())
+      .get('/api/transactions')
+      .set('x-api-key', apiKey)
+      .query({ from: '2026-02-12', to: '2026-02-11' })
+      .expect(400);
   });
 
   it('transactions: 404 on update/delete missing id', async () => {

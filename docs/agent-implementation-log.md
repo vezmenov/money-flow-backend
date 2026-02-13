@@ -175,3 +175,15 @@
     - `src/recurring-expenses/recurring-expense.entity.ts`
     - `test/money.spec.ts`
     - `test/api-crud.e2e.spec.ts`
+
+25. Добавлен листинг транзакций с фильтрами и пагинацией:
+    - query параметры: `from`, `to`, `categoryId`, `source`, `limit`, `offset`
+    - ответ: header `X-Total-Count`
+    - индексы на `transactions(date)`, `transactions(categoryId)`, `transactions(source)`
+    Файлы:
+    - `src/transactions/dto/list-transactions.dto.ts`
+    - `src/transactions/transactions.controller.ts`
+    - `src/transactions/transactions.service.ts`
+    - `src/migrations/20260213-0003-transactions-indexes.ts`
+    - `openapi.yaml`
+    - `test/api-crud.e2e.spec.ts`
