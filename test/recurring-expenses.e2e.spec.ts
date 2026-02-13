@@ -20,9 +20,11 @@ import { Transaction } from '../src/transactions/transaction.entity';
 describe('Recurring expenses + timezone + OpenClaw', () => {
   let app: INestApplication;
   let dataSource: DataSource;
+  const apiKey = 'appkey';
 
   beforeAll(async () => {
     process.env.OPENCLAW_API_KEY = 'devkey';
+    process.env.APP_API_KEY = apiKey;
 
     const moduleRef = await Test.createTestingModule({
       imports: [
@@ -56,6 +58,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
   afterAll(async () => {
     delete process.env.OPENCLAW_API_KEY;
+    delete process.env.APP_API_KEY;
     await app.close();
   });
 
@@ -66,11 +69,13 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
   it('timezone default is +03:00 and normalizes UTC+3', async () => {
     await request(app.getHttpServer())
       .get('/api/settings/timezone')
+      .set('x-api-key', apiKey)
       .expect(200)
       .expect({ utcOffset: '+03:00' });
 
     await request(app.getHttpServer())
       .put('/api/settings/timezone')
+      .set('x-api-key', apiKey)
       .send({ utcOffset: 'UTC+3' })
       .expect(200)
       .expect({ utcOffset: '+03:00' });
@@ -79,12 +84,14 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
   it('creates recurring expense, lists for month, and deletes it', async () => {
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Rent' })
       .expect(201)
       .then((r) => r.body as { id: string });
 
     const recurring = await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 1000,
@@ -97,6 +104,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const list = await request(app.getHttpServer())
       .get('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .query({ month: '2026-02' })
       .expect(200)
       .then((r) => r.body as any[]);
@@ -108,10 +116,12 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     await request(app.getHttpServer())
       .delete(`/api/recurring-expenses/${recurring.id}`)
+      .set('x-api-key', apiKey)
       .expect(204);
 
     await request(app.getHttpServer())
       .get('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .query({ month: '2026-02' })
       .expect(200)
       .then((r) => {
@@ -122,6 +132,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
   it('validates recurring creation (category must exist, dayOfMonth must match date)', async () => {
     await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: '00000000-0000-0000-0000-000000000000',
         amount: 10,
@@ -132,12 +143,14 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Test' })
       .expect(201)
       .then((r) => r.body as { id: string });
 
     await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 10,
@@ -163,12 +176,14 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
   it('list for month validates YYYY-MM and excludes recurring that have not started yet', async () => {
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Future' })
       .expect(201)
       .then((r) => r.body as { id: string });
 
     await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 10,
@@ -179,6 +194,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     await request(app.getHttpServer())
       .get('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .query({ month: '2026-02' })
       .expect(200)
       .then((r) => {
@@ -187,6 +203,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     await request(app.getHttpServer())
       .get('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .query({ month: '2026/02' })
       .expect(400);
   });
@@ -195,17 +212,20 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
     // Use UTC for deterministic "local time" in the processor.
     await request(app.getHttpServer())
       .put('/api/settings/timezone')
+      .set('x-api-key', apiKey)
       .send({ utcOffset: '+00:00' })
       .expect(200);
 
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Subscriptions' })
       .expect(201)
       .then((r) => r.body as { id: string });
 
     const recurring = await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 10,
@@ -228,6 +248,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const txs = await request(app.getHttpServer())
       .get('/api/transactions')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as any[]);
 
@@ -238,6 +259,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const list = await request(app.getHttpServer())
       .get('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .query({ month: '2026-02' })
       .expect(200)
       .then((r) => r.body as any[]);
@@ -248,10 +270,12 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
     // Deleting the template must not delete committed transactions.
     await request(app.getHttpServer())
       .delete(`/api/recurring-expenses/${recurring.id}`)
+      .set('x-api-key', apiKey)
       .expect(204);
 
     const txsAfterDelete = await request(app.getHttpServer())
       .get('/api/transactions')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as any[]);
 
@@ -263,17 +287,20 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
   it('processor shifts 31st to the last day of shorter months when committing', async () => {
     await request(app.getHttpServer())
       .put('/api/settings/timezone')
+      .set('x-api-key', apiKey)
       .send({ utcOffset: '+00:00' })
       .expect(200);
 
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Bills' })
       .expect(201)
       .then((r) => r.body as { id: string });
 
     const recurring = await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 1,
@@ -297,6 +324,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
     const expectedKey = recurringTransactionIdempotencyKey(recurring.id, '2026-02-28');
     const txs = await request(app.getHttpServer())
       .get('/api/transactions')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as any[]);
 
@@ -308,17 +336,20 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
   it('processor catches up missed days using lastProcessedDate', async () => {
     await request(app.getHttpServer())
       .put('/api/settings/timezone')
+      .set('x-api-key', apiKey)
       .send({ utcOffset: '+00:00' })
       .expect(200);
 
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Catchup' })
       .expect(201)
       .then((r) => r.body as { id: string });
 
     const recurring11 = await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 11,
@@ -330,6 +361,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const recurring12 = await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 12,
@@ -341,6 +373,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const recurring13 = await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 13,
@@ -367,6 +400,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const txs = await request(app.getHttpServer())
       .get('/api/transactions')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as any[]);
 
@@ -388,12 +422,14 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
   it('dayOfMonth=31 shifts to last day of shorter months in listing', async () => {
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Bills' })
       .expect(201)
       .then((r) => r.body as { id: string });
 
     await request(app.getHttpServer())
       .post('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 1,
@@ -405,6 +441,7 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
 
     const list = await request(app.getHttpServer())
       .get('/api/recurring-expenses')
+      .set('x-api-key', apiKey)
       .query({ month: '2026-02' })
       .expect(200)
       .then((r) => r.body as any[]);

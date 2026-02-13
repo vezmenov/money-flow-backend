@@ -28,6 +28,7 @@ npm run test:watch
 
 ## Что покрыто
 E2E тесты (через Nest Test + supertest, SQLite in-memory):
+- основной контур `/api` защищён `x-api-key` (APP_API_KEY), поэтому в e2e запросах он всегда выставляется
 - настройки таймзоны:
   - `GET /api/settings/timezone` (дефолт `+03:00`)
   - `PUT /api/settings/timezone` (нормализация `UTC+3 -> +03:00`)

@@ -12,8 +12,11 @@ import { Transaction } from '../src/transactions/transaction.entity';
 describe('API CRUD (categories/transactions)', () => {
   let app: INestApplication;
   let dataSource: DataSource;
+  const apiKey = 'appkey';
 
   beforeAll(async () => {
+    process.env.APP_API_KEY = apiKey;
+
     const moduleRef = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot({
@@ -42,6 +45,7 @@ describe('API CRUD (categories/transactions)', () => {
   });
 
   afterAll(async () => {
+    delete process.env.APP_API_KEY;
     await app.close();
   });
 
@@ -52,18 +56,21 @@ describe('API CRUD (categories/transactions)', () => {
   it('categories: create/list/update/delete', async () => {
     const createdB = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'B' })
       .expect(201)
       .then((r) => r.body as { id: string; name: string });
 
     const createdA = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'A' })
       .expect(201)
       .then((r) => r.body as { id: string; name: string });
 
     const list = await request(app.getHttpServer())
       .get('/api/categories')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as Array<{ id: string; name: string }>);
 
@@ -72,6 +79,7 @@ describe('API CRUD (categories/transactions)', () => {
 
     await request(app.getHttpServer())
       .put(`/api/categories/${createdA.id}`)
+      .set('x-api-key', apiKey)
       .send({ name: 'AA' })
       .expect(200)
       .then((r) => {
@@ -79,10 +87,14 @@ describe('API CRUD (categories/transactions)', () => {
         expect(r.body.name).toBe('AA');
       });
 
-    await request(app.getHttpServer()).delete(`/api/categories/${createdB.id}`).expect(204);
+    await request(app.getHttpServer())
+      .delete(`/api/categories/${createdB.id}`)
+      .set('x-api-key', apiKey)
+      .expect(204);
 
     const listAfter = await request(app.getHttpServer())
       .get('/api/categories')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as Array<{ id: string; name: string }>);
 
@@ -92,17 +104,20 @@ describe('API CRUD (categories/transactions)', () => {
   it('categories: 404 on update/delete missing id', async () => {
     await request(app.getHttpServer())
       .put('/api/categories/00000000-0000-0000-0000-000000000000')
+      .set('x-api-key', apiKey)
       .send({ name: 'X' })
       .expect(404);
 
     await request(app.getHttpServer())
       .delete('/api/categories/00000000-0000-0000-0000-000000000000')
+      .set('x-api-key', apiKey)
       .expect(404);
   });
 
   it('transactions: create/list/update/delete + validation', async () => {
     const category = await request(app.getHttpServer())
       .post('/api/categories')
+      .set('x-api-key', apiKey)
       .send({ name: 'Food' })
       .expect(201)
       .then((r) => r.body as { id: string });
@@ -110,6 +125,7 @@ describe('API CRUD (categories/transactions)', () => {
     // Validation: invalid amount (too many decimals) should fail.
     await request(app.getHttpServer())
       .post('/api/transactions')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 1.234,
@@ -119,6 +135,7 @@ describe('API CRUD (categories/transactions)', () => {
 
     const created1 = await request(app.getHttpServer())
       .post('/api/transactions')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 10.5,
@@ -133,6 +150,7 @@ describe('API CRUD (categories/transactions)', () => {
 
     const created2 = await request(app.getHttpServer())
       .post('/api/transactions')
+      .set('x-api-key', apiKey)
       .send({
         categoryId: category.id,
         amount: 20,
@@ -144,6 +162,7 @@ describe('API CRUD (categories/transactions)', () => {
 
     const list = await request(app.getHttpServer())
       .get('/api/transactions')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as Array<{ id: string; date: string }>);
 
@@ -152,6 +171,7 @@ describe('API CRUD (categories/transactions)', () => {
 
     await request(app.getHttpServer())
       .put(`/api/transactions/${created2.id}`)
+      .set('x-api-key', apiKey)
       .send({ amount: 21.0, description: 'Updated' })
       .expect(200)
       .then((r) => {
@@ -160,10 +180,14 @@ describe('API CRUD (categories/transactions)', () => {
         expect(r.body.description).toBe('Updated');
       });
 
-    await request(app.getHttpServer()).delete(`/api/transactions/${created1.id}`).expect(204);
+    await request(app.getHttpServer())
+      .delete(`/api/transactions/${created1.id}`)
+      .set('x-api-key', apiKey)
+      .expect(204);
 
     const listAfter = await request(app.getHttpServer())
       .get('/api/transactions')
+      .set('x-api-key', apiKey)
       .expect(200)
       .then((r) => r.body as Array<{ id: string }>);
 
@@ -173,11 +197,13 @@ describe('API CRUD (categories/transactions)', () => {
   it('transactions: 404 on update/delete missing id', async () => {
     await request(app.getHttpServer())
       .put('/api/transactions/00000000-0000-0000-0000-000000000000')
+      .set('x-api-key', apiKey)
       .send({ amount: 1 })
       .expect(404);
 
     await request(app.getHttpServer())
       .delete('/api/transactions/00000000-0000-0000-0000-000000000000')
+      .set('x-api-key', apiKey)
       .expect(404);
   });
 });

@@ -139,3 +139,17 @@
     - `src/app.module.ts`
     - `openapi.yaml`
     - `docs/export-xlsx.md`
+
+22. Основной контур `/api` защищён API key:
+    - новый `APP_API_KEY` (env)
+    - проверка по заголовку `x-api-key`
+    - `/api/health` остаётся публичным (без ключа)
+    Файлы:
+    - `src/auth/app-api-key.guard.ts`
+    - `src/categories/categories.controller.ts`
+    - `src/transactions/transactions.controller.ts`
+    - `src/settings/settings.controller.ts`
+    - `src/recurring-expenses/recurring-expenses.controller.ts`
+    - `src/exports/exports.controller.ts`
+    - `openapi.yaml`
+    - `docs/deployment.md`

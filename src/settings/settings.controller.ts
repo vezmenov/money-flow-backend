@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { UpdateTimezoneDto } from './dto/update-timezone.dto';
 import { SettingsService } from './settings.service';
+import { AppApiKeyGuard } from '../auth/app-api-key.guard';
 
 @Controller('settings')
+@UseGuards(AppApiKeyGuard)
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 

@@ -19,6 +19,14 @@ Workflow: `.github/workflows/deploy.yml`
 
 Если `OPENCLAW_API_KEY` не задан, OpenClaw endpoints будут отвечать `503` (misconfig).
 
+## Важно для основного API
+Основной контур `/api/*` защищён `x-api-key` (single-user режим).
+
+Нужно задать:
+- `APP_API_KEY` (секретный ключ для UI/основного API)
+
+Если `APP_API_KEY` не задан, основной API будет отвечать `503` (misconfig).
+
 ## Важно для регулярных трат
 Парсер регулярных трат запускается внутри backend (schedule job) и создаёт транзакции автоматически.
 

@@ -24,8 +24,11 @@ function binaryParser(res: any, callback: (err: Error | null, data: Buffer) => v
 describe('Export XLSX', () => {
   let app: INestApplication;
   let dataSource: DataSource;
+  const apiKey = 'appkey';
 
   beforeAll(async () => {
+    process.env.APP_API_KEY = apiKey;
+
     const moduleRef = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot({
@@ -53,6 +56,7 @@ describe('Export XLSX', () => {
   });
 
   afterAll(async () => {
+    delete process.env.APP_API_KEY;
     await app.close();
   });
 
@@ -102,6 +106,7 @@ describe('Export XLSX', () => {
 
     const resp = await request(app.getHttpServer())
       .get('/api/export/xlsx')
+      .set('x-api-key', apiKey)
       .buffer(true)
       .parse(binaryParser)
       .expect(200)

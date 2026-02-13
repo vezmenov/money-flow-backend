@@ -4,10 +4,13 @@ info:
   version: 1.0.0
 servers:
   - url: /api
+security:
+  - ApiKeyAuth: []
 paths:
   /health:
     get:
       summary: Health check
+      security: []
       responses:
         '200':
           description: OK
@@ -234,6 +237,11 @@ paths:
                 type: string
                 format: binary
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
   schemas:
     Category:
       type: object

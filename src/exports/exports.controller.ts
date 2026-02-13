@@ -1,8 +1,10 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
+import { AppApiKeyGuard } from '../auth/app-api-key.guard';
 import { ExportsService } from './exports.service';
 
 @Controller('export')
+@UseGuards(AppApiKeyGuard)
 export class ExportsController {
   constructor(private readonly exportsService: ExportsService) {}
 

@@ -1,10 +1,22 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateRecurringExpenseDto } from './dto/create-recurring-expense.dto';
 import { ListRecurringExpensesQueryDto } from './dto/list-recurring-expenses.dto';
 import { RecurringExpenseForMonth, RecurringExpensesService } from './recurring-expenses.service';
 import { RecurringExpense } from './recurring-expense.entity';
+import { AppApiKeyGuard } from '../auth/app-api-key.guard';
 
 @Controller('recurring-expenses')
+@UseGuards(AppApiKeyGuard)
 export class RecurringExpensesController {
   constructor(private readonly recurringExpensesService: RecurringExpensesService) {}
 

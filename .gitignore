@@ -2,6 +2,7 @@ node_modules
 /dist
 /data/database.sqlite
 /sdk
+/coverage
 .env
 .idea
 .vscode

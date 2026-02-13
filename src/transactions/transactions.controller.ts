@@ -1,10 +1,22 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transaction.entity';
+import { AppApiKeyGuard } from '../auth/app-api-key.guard';
 
 @Controller('transactions')
+@UseGuards(AppApiKeyGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
