@@ -54,3 +54,6 @@
 
 10. Выравнен HTTP-код ответа импорта с контрактом (`200` вместо дефолтного `201` для POST).
     Файл: `/Users/slave/FettrCode/money-flow-backend/src/openclaw/openclaw.controller.ts`
+
+11. Деплой делается пушем в `main` (GitHub Actions workflow на self-hosted раннере).
+    Док: `/Users/slave/FettrCode/money-flow-backend/docs/deployment.md`
