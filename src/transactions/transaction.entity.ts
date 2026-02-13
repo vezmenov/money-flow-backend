@@ -1,5 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Category } from '../categories/category.entity';
+import { amountToCents, centsToAmount } from '../common/money';
 
 @Index('IDX_transactions_source_idempotencyKey', ['source', 'idempotencyKey'], {
   unique: true,
@@ -22,7 +23,14 @@ export class Transaction {
   @JoinColumn({ name: 'categoryId' })
   category!: Category;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2 })
+  @Column({
+    type: 'integer',
+    name: 'amountCents',
+    transformer: {
+      to: (value: number) => amountToCents(value),
+      from: (value: unknown) => centsToAmount(Number(value)),
+    },
+  })
   amount!: number;
 
   @Column({ type: 'date' })

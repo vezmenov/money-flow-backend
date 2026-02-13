@@ -148,6 +148,13 @@ describe('API CRUD (categories/transactions)', () => {
     expect(created1.source).toBe('manual');
     expect(created1.idempotencyKey ?? null).toBeNull();
 
+    const stored = (await dataSource.query(
+      `SELECT amountCents as amountCents FROM transactions WHERE id = ?`,
+      [created1.id],
+    )) as Array<{ amountCents: number }>;
+    expect(stored).toHaveLength(1);
+    expect(stored[0].amountCents).toBe(1050);
+
     const created2 = await request(app.getHttpServer())
       .post('/api/transactions')
       .set('x-api-key', apiKey)

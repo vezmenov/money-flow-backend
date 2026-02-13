@@ -27,6 +27,14 @@ Workflow: `.github/workflows/deploy.yml`
 
 Если `APP_API_KEY` не задан, основной API будет отвечать `503` (misconfig).
 
+## База данных / миграции
+SQLite база по умолчанию: `data/database.sqlite`.
+
+Можно переопределить путь:
+- `DB_PATH` (например `data/database.sqlite`)
+
+Схема управляется миграциями (TypeORM), `synchronize: false`.
+
 ## Важно для регулярных трат
 Парсер регулярных трат запускается внутри backend (schedule job) и создаёт транзакции автоматически.
 

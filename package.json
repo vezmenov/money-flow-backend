@@ -18,6 +18,9 @@
     "openapi:validate": "node scripts/validate-openapi.cjs",
     "docs:check": "node scripts/check-docs.cjs",
     "check": "npm run format:check && npm run lint:check && npm run build && npm test && npm run openapi:validate && npm run docs:check",
+    "migration:generate": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:generate src/migrations/migration -p",
+    "migration:run": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:run",
+    "migration:revert": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:revert",
     "prepare": "husky"
   },
   "dependencies": {

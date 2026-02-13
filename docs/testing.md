@@ -69,6 +69,7 @@ E2E тесты (через Nest Test + supertest, SQLite in-memory):
 - `test/openclaw-import.e2e.spec.ts`
 - `test/api-crud.e2e.spec.ts`
 - `test/export-xlsx.e2e.spec.ts`
+- `test/money.spec.ts`
 - `test/settings-utc-offset.spec.ts`
 - `test/transaction-idempotency-index.spec.ts`
 - `test/openapi-contract.spec.ts`

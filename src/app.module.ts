@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CategoriesModule } from './categories/categories.module';
@@ -15,9 +16,11 @@ import { TransactionsModule } from './transactions/transactions.module';
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'data/database.sqlite',
+      database: process.env.DB_PATH ?? 'data/database.sqlite',
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
+      migrationsRun: true,
+      migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
     }),
     CategoriesModule,
     ExportsModule,

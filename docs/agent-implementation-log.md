@@ -153,3 +153,25 @@
     - `src/exports/exports.controller.ts`
     - `openapi.yaml`
     - `docs/deployment.md`
+
+23. Включены миграции TypeORM вместо `synchronize: true`:
+    - `synchronize: false`
+    - `migrationsRun: true`
+    - добавлен DataSource для CLI и scripts
+    Файлы:
+    - `src/database/data-source.ts`
+    - `src/migrations/20260213-0001-baseline.ts`
+    - `package.json`
+    - `src/app.module.ts`
+
+24. Деньги в БД переведены на integer cents:
+    - в таблицах `transactions` и `recurring_expenses` теперь хранится `amountCents INTEGER`
+    - в API/коде остаётся `amount:number` (конверсия через transformer)
+    - миграция делает pre-migration snapshot (VACUUM INTO / fallback copy)
+    Файлы:
+    - `src/common/money.ts`
+    - `src/migrations/20260213-0002-amount-cents.ts`
+    - `src/transactions/transaction.entity.ts`
+    - `src/recurring-expenses/recurring-expense.entity.ts`
+    - `test/money.spec.ts`
+    - `test/api-crud.e2e.spec.ts`
