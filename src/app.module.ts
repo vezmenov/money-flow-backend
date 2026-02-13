@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { BackupsModule } from './backups/backups.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ExportsModule } from './exports/exports.module';
 import { OpenClawModule } from './openclaw/openclaw.module';
@@ -22,6 +23,7 @@ import { TransactionsModule } from './transactions/transactions.module';
       migrationsRun: true,
       migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
     }),
+    BackupsModule,
     CategoriesModule,
     ExportsModule,
     OpenClawModule,

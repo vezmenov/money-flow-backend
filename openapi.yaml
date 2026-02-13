@@ -284,6 +284,22 @@ paths:
               schema:
                 type: string
                 format: binary
+  /backup/sqlite:
+    get:
+      summary: Download SQLite backup (.gz)
+      responses:
+        '200':
+          description: Gzip-compressed SQLite database file
+          headers:
+            Content-Disposition:
+              description: Attachment filename
+              schema:
+                type: string
+          content:
+            application/gzip:
+              schema:
+                type: string
+                format: binary
 components:
   securitySchemes:
     ApiKeyAuth:

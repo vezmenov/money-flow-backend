@@ -15,6 +15,7 @@ describe('OpenAPI contract (must cover implemented API)', () => {
     );
     expect(paths).toEqual(expect.arrayContaining(['/settings/timezone']));
     expect(paths).toEqual(expect.arrayContaining(['/export/xlsx']));
+    expect(paths).toEqual(expect.arrayContaining(['/backup/sqlite']));
 
     const txSchema = spec.components?.schemas?.Transaction;
     expect(txSchema?.properties?.source).toBeDefined();

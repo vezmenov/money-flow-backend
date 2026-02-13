@@ -35,6 +35,17 @@ SQLite база по умолчанию: `data/database.sqlite`.
 
 Схема управляется миграциями (TypeORM), `synchronize: false`.
 
+## Бэкапы
+Бэкапы SQLite делаются в gzip и складываются в директорию:
+- `BACKUP_DIR` (default: `data/backups`)
+
+Ретеншн:
+- `BACKUP_RETENTION_DAYS` (default: `30`)
+
+Ручной скачиваемый бэкап:
+- `GET /api/backup/sqlite` (нужен `APP_API_KEY`)
+Док: `docs/backups.md`
+
 ## Важно для регулярных трат
 Парсер регулярных трат запускается внутри backend (schedule job) и создаёт транзакции автоматически.
 

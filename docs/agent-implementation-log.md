@@ -199,3 +199,18 @@
     - `src/recurring-expenses/recurring-expenses.processor.ts`
     - `src/recurring-expenses/recurring-expenses.module.ts`
     - `test/job-locks.spec.ts`
+
+27. Добавлены SQLite бэкапы:
+    - cron job делает `.sqlite.gz` в `BACKUP_DIR` и чистит старые файлы по `BACKUP_RETENTION_DAYS`
+    - `GET /api/backup/sqlite` отдаёт файл на скачивание (под `APP_API_KEY`)
+    Файлы:
+    - `src/backups/backups.service.ts`
+    - `src/backups/backups.controller.ts`
+    - `src/backups/backups.processor.ts`
+    - `src/backups/backups.module.ts`
+    - `src/app.module.ts`
+    - `openapi.yaml`
+    - `docs/backups.md`
+    - `docs/deployment.md`
+    - `scripts/check-docs.cjs`
+    - `test/backup-sqlite.e2e.spec.ts`
