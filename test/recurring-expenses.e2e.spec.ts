@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 import { CategoriesModule } from '../src/categories/categories.module';
 import { Category } from '../src/categories/category.entity';
 import { OpenClawModule } from '../src/openclaw/openclaw.module';
+import { JobLock } from '../src/job-locks/job-lock.entity';
 import { RecurringExpense } from '../src/recurring-expenses/recurring-expense.entity';
 import { RecurringExpensesProcessor } from '../src/recurring-expenses/recurring-expenses.processor';
 import { RecurringExpensesModule } from '../src/recurring-expenses/recurring-expenses.module';
@@ -33,7 +34,14 @@ describe('Recurring expenses + timezone + OpenClaw', () => {
           database: ':memory:',
           dropSchema: true,
           synchronize: true,
-          entities: [Category, Transaction, Settings, RecurringExpense, RecurringProcessingState],
+          entities: [
+            Category,
+            Transaction,
+            Settings,
+            RecurringExpense,
+            RecurringProcessingState,
+            JobLock,
+          ],
         }),
         CategoriesModule,
         TransactionsModule,

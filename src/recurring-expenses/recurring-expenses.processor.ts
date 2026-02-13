@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JobLocksService } from '../job-locks/job-locks.service';
 import { SettingsService } from '../settings/settings.service';
 import { Transaction } from '../transactions/transaction.entity';
 import { RecurringExpense } from './recurring-expense.entity';
@@ -20,11 +21,17 @@ export class RecurringExpensesProcessor {
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
     private readonly settingsService: SettingsService,
+    private readonly jobLocksService: JobLocksService,
   ) {}
 
   @Cron('*/5 * * * *')
   async tick(): Promise<void> {
     if (this.running) {
+      return;
+    }
+
+    const acquired = await this.jobLocksService.acquire('recurring-expenses', 30 * 60_000);
+    if (!acquired) {
       return;
     }
 

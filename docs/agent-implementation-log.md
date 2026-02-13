@@ -187,3 +187,15 @@
     - `src/migrations/20260213-0003-transactions-indexes.ts`
     - `openapi.yaml`
     - `test/api-crud.e2e.spec.ts`
+
+26. Добавлен DB-lock для cron/job (на несколько инстансов):
+    - таблица `job_locks` + сервис `acquire(name, ttlMs)`
+    - recurring job теперь запускается только если lock взят
+    Файлы:
+    - `src/job-locks/job-lock.entity.ts`
+    - `src/job-locks/job-locks.service.ts`
+    - `src/job-locks/job-locks.module.ts`
+    - `src/migrations/20260213-0004-job-locks.ts`
+    - `src/recurring-expenses/recurring-expenses.processor.ts`
+    - `src/recurring-expenses/recurring-expenses.module.ts`
+    - `test/job-locks.spec.ts`
