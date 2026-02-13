@@ -128,3 +128,14 @@
     - `test/settings-utc-offset.spec.ts`
     - `test/transaction-idempotency-index.spec.ts`
     - `test/openapi-contract.spec.ts`
+
+21. Добавлен экспорт данных в XLSX:
+    - `GET /api/export/xlsx` возвращает `.xlsx` файл для скачивания
+    - 3 листа: `Transactions`, `Categories`, `Recurring`
+    Файлы:
+    - `src/exports/exports.controller.ts`
+    - `src/exports/exports.service.ts`
+    - `src/exports/exports.module.ts`
+    - `src/app.module.ts`
+    - `openapi.yaml`
+    - `docs/export-xlsx.md`

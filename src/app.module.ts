@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CategoriesModule } from './categories/categories.module';
+import { ExportsModule } from './exports/exports.module';
 import { OpenClawModule } from './openclaw/openclaw.module';
 import { RecurringExpensesModule } from './recurring-expenses/recurring-expenses.module';
 import { SettingsModule } from './settings/settings.module';
@@ -19,6 +20,7 @@ import { TransactionsModule } from './transactions/transactions.module';
       synchronize: true,
     }),
     CategoriesModule,
+    ExportsModule,
     OpenClawModule,
     SettingsModule,
     RecurringExpensesModule,

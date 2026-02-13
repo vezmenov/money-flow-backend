@@ -217,6 +217,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimezoneSettings'
+  /export/xlsx:
+    get:
+      summary: Export data to XLSX
+      responses:
+        '200':
+          description: XLSX file
+          headers:
+            Content-Disposition:
+              description: Attachment filename
+              schema:
+                type: string
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
 components:
   schemas:
     Category:

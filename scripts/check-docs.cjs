@@ -8,6 +8,7 @@ const repoRoot = path.resolve(__dirname, '..');
 const REQUIRED_DOCS = [
   'docs/agent-implementation-log.md',
   'docs/deployment.md',
+  'docs/export-xlsx.md',
   'docs/openclaw-agent-api.md',
   'docs/recurring-expenses.md',
   'docs/testing.md',
@@ -100,4 +101,3 @@ function main() {
 }
 
 main();
-
