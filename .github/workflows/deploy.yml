@@ -78,3 +78,23 @@ jobs:
           cd "$HOME/apps/money-flow-infra"
           docker compose up -d --build
           docker compose ps
+
+          echo "Waiting for backend to become healthy..."
+          ok="0"
+          for _ in $(seq 1 60); do
+            if curl -fsS "http://localhost:8080/api/health" > /dev/null; then
+              ok="1"
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "$ok" != "1" ]; then
+            echo "ERROR: backend did not become healthy in time" >&2
+            docker compose ps || true
+            docker compose logs --tail=200 backend proxy || true
+            exit 1
+          fi
+
+          curl -fsS "http://localhost:8080/api/ready" > /dev/null
+          curl -fsS "http://localhost:8080/api/openclaw/v1/health" > /dev/null
