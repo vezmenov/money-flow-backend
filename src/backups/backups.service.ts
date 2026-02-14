@@ -91,7 +91,8 @@ export class BackupsService {
 
 function parsePositiveInt(value: string | undefined, fallback: number): number {
   const n = Number.parseInt((value ?? '').trim(), 10);
-  if (!Number.isFinite(n) || n <= 0) {
+  // Allow 0 to disable cleanup.
+  if (!Number.isFinite(n) || n < 0) {
     return fallback;
   }
   return n;

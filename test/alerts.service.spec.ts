@@ -1,12 +1,16 @@
 import { AlertsService } from '../src/alerts/alerts.service';
+import { Logger } from '@nestjs/common';
 
 describe('AlertsService', () => {
   const originalFetch = global.fetch;
+  const originalNodeEnv = process.env.NODE_ENV;
 
   afterEach(() => {
     global.fetch = originalFetch;
     delete process.env.TELEGRAM_BOT_TOKEN;
     delete process.env.TELEGRAM_CHAT_ID;
+    process.env.NODE_ENV = originalNodeEnv;
+    jest.restoreAllMocks();
   });
 
   it('does not call fetch when Telegram env is not configured', async () => {
@@ -55,5 +59,43 @@ describe('AlertsService', () => {
 
     const service = new AlertsService();
     await expect(service.alert('fail')).resolves.toBeUndefined();
+  });
+
+  it('logs and handles non-ok Telegram responses in non-test env', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.TELEGRAM_BOT_TOKEN = 't';
+    process.env.TELEGRAM_CHAT_ID = 'c';
+
+    const loggerSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      text: async () => 'nope',
+    });
+    global.fetch = fetchMock as any;
+
+    const service = new AlertsService();
+    await service.alert('boom');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('[money-flow] boom'));
+    expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Telegram alert failed'));
+  });
+
+  it('logs fetch errors in non-test env', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.TELEGRAM_BOT_TOKEN = 't';
+    process.env.TELEGRAM_CHAT_ID = 'c';
+
+    const loggerSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+
+    const fetchMock = jest.fn().mockRejectedValue(new Error('network'));
+    global.fetch = fetchMock as any;
+
+    const service = new AlertsService();
+    await service.alert('fail');
+
+    expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('Telegram alert error'));
   });
 });

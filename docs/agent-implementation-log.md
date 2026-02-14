@@ -248,3 +248,21 @@
     - `src/bootstrap.ts`
     - `src/main.ts`
     - `test/body-limits.e2e.spec.ts`
+
+30. Ужесточены quality gates по тестам и coverage:
+    - `npm run check` теперь запускает `jest --coverage`
+    - добавлены `coverageThreshold` в `jest.config.cjs` (statements/lines/functions/branches)
+    - расширено покрытие unit/e2e тестами (bootstrap/CORS, backups сервис/процессор, APP_API_KEY misconfig, job locks edge-cases)
+    Файлы:
+    - `package.json`
+    - `jest.config.cjs`
+    - `docs/testing.md`
+    - `docs/backups.md`
+    - `src/alerts/alerts.service.ts`
+    - `src/backups/backups.service.ts`
+    - `test/bootstrap.spec.ts`
+    - `test/backups.service.spec.ts`
+    - `test/backups.processor.spec.ts`
+    - `test/app-api-key.guard.e2e.spec.ts`
+    - `test/job-locks.spec.ts`
+    - `test/money.spec.ts`

@@ -38,4 +38,21 @@ describe('JobLocksService', () => {
   it('rejects empty lock names', async () => {
     await expect(service.acquire('   ', 60_000)).rejects.toThrow('Job lock name must be non-empty');
   });
+
+  it('rejects non-positive ttlMs', async () => {
+    await expect(service.acquire('x', 0)).rejects.toThrow('Job lock ttlMs must be > 0');
+  });
+
+  it('uses INSTANCE_ID when set', async () => {
+    process.env.INSTANCE_ID = 'test-instance';
+    try {
+      const s2 = new JobLocksService(dataSource);
+      await s2.acquire('inst', 60_000);
+
+      const row = await dataSource.getRepository(JobLock).findOneBy({ name: 'inst' });
+      expect(row?.lockedBy).toBe('test-instance');
+    } finally {
+      delete process.env.INSTANCE_ID;
+    }
+  });
 });

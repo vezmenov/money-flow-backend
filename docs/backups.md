@@ -6,6 +6,7 @@
 - `DB_PATH` (default: `data/database.sqlite`)
 - `BACKUP_DIR` (default: `data/backups`)
 - `BACKUP_RETENTION_DAYS` (default: `30`)
+  - `0` = не чистить старые бэкапы автоматически
 
 ## Автобэкап (cron)
 В фоне запускается job, который 1 раз в день делает gzip-бэкап SQLite в `BACKUP_DIR` и чистит старые файлы по ретеншну.
@@ -24,4 +25,3 @@
    - `gunzip -c money-flow-backup-....sqlite.gz > restored.sqlite`
 4. Заменить файл базы по пути `DB_PATH` на `restored.sqlite` (перед заменой лучше сделать копию текущего файла).
 5. Запустить сервис.
-

@@ -8,7 +8,9 @@ export class AlertsService {
     const text = `[money-flow] ${message}`;
 
     // Always log locally (even if Telegram is not configured).
-    this.logger.error(text);
+    if (process.env.NODE_ENV !== 'test') {
+      this.logger.error(text);
+    }
 
     const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
     const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
@@ -25,10 +27,14 @@ export class AlertsService {
 
       if (!resp.ok) {
         const body = await resp.text().catch(() => '');
-        this.logger.error(`Telegram alert failed: ${resp.status} ${body}`);
+        if (process.env.NODE_ENV !== 'test') {
+          this.logger.error(`Telegram alert failed: ${resp.status} ${body}`);
+        }
       }
     } catch (err) {
-      this.logger.error(`Telegram alert error: ${String(err)}`);
+      if (process.env.NODE_ENV !== 'test') {
+        this.logger.error(`Telegram alert error: ${String(err)}`);
+      }
     }
   }
 }

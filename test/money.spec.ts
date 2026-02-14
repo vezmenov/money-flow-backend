@@ -9,6 +9,12 @@ describe('Money conversions (amount <-> cents)', () => {
     expect(amountToCents(9999999.99)).toBe(999999999);
   });
 
+  it('supports negative amounts and scientific notation fallback', () => {
+    expect(amountToCents(-10.5)).toBe(-1050);
+    // toString() includes `e` for this value on JS engines, hitting the fallback branch.
+    expect(amountToCents(1e-7)).toBe(0);
+  });
+
   it('converts cents back to amount', () => {
     expect(centsToAmount(0)).toBe(0);
     expect(centsToAmount(1)).toBe(0.01);
