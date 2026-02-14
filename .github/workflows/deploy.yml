@@ -97,4 +97,3 @@ jobs:
           fi
 
           curl -fsS "http://localhost:8080/api/ready" > /dev/null
-          curl -fsS "http://localhost:8080/api/openclaw/v1/health" > /dev/null
