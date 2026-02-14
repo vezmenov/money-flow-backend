@@ -2,8 +2,8 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export class AmountCents202602130002 implements MigrationInterface {
-  name = 'AmountCents202602130002';
+export class AmountCents1770940800002 implements MigrationInterface {
+  name = 'AmountCents1770940800002';
 
   async up(queryRunner: QueryRunner): Promise<void> {
     // Create a pre-migration snapshot, so a failed migration doesn't brick your data.
