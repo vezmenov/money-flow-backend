@@ -29,6 +29,9 @@ Env:
 Routes:
 - `GET /api/openclaw/v1/health`
 - `GET /api/openclaw/v1/categories`
+- `POST /api/openclaw/v1/categories`
+- `PUT /api/openclaw/v1/categories/:id`
+- `DELETE /api/openclaw/v1/categories/:id`
 - `POST /api/openclaw/v1/transactions/import`
 - `GET /api/openclaw/v1/transactions/:idempotencyKey`
 - `DELETE /api/openclaw/v1/transactions/:idempotencyKey`
