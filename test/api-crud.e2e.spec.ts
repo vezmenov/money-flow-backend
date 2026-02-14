@@ -57,34 +57,43 @@ describe('API CRUD (categories/transactions)', () => {
     const createdB = await request(app.getHttpServer())
       .post('/api/categories')
       .set('x-api-key', apiKey)
-      .send({ name: 'B' })
+      .send({ name: 'B', color: '#10b981', type: 'expense' })
       .expect(201)
-      .then((r) => r.body as { id: string; name: string });
+      .then((r) => r.body as { id: string; name: string; color: string; type: string });
+
+    expect(createdB.color).toBe('#10b981');
+    expect(createdB.type).toBe('expense');
 
     const createdA = await request(app.getHttpServer())
       .post('/api/categories')
       .set('x-api-key', apiKey)
-      .send({ name: 'A' })
+      .send({ name: 'A', color: '#3b82f6', type: 'expense' })
       .expect(201)
-      .then((r) => r.body as { id: string; name: string });
+      .then((r) => r.body as { id: string; name: string; color: string; type: string });
+
+    expect(createdA.color).toBe('#3b82f6');
+    expect(createdA.type).toBe('expense');
 
     const list = await request(app.getHttpServer())
       .get('/api/categories')
       .set('x-api-key', apiKey)
       .expect(200)
-      .then((r) => r.body as Array<{ id: string; name: string }>);
+      .then((r) => r.body as Array<{ id: string; name: string; color: string; type: string }>);
 
     // Service sorts by name ASC.
     expect(list.map((c) => c.name)).toEqual(['A', 'B']);
+    expect(list.find((c) => c.id === createdA.id)?.color).toBe('#3b82f6');
+    expect(list.find((c) => c.id === createdB.id)?.color).toBe('#10b981');
 
     await request(app.getHttpServer())
       .put(`/api/categories/${createdA.id}`)
       .set('x-api-key', apiKey)
-      .send({ name: 'AA' })
+      .send({ name: 'AA', color: '#f87171' })
       .expect(200)
       .then((r) => {
         expect(r.body.id).toBe(createdA.id);
         expect(r.body.name).toBe('AA');
+        expect(r.body.color).toBe('#f87171');
       });
 
     await request(app.getHttpServer())
