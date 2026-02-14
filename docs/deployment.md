@@ -13,6 +13,20 @@ Workflow: `.github/workflows/deploy.yml`
 - синк репозиториев `money-flow`, `money-flow-backend`, `money-flow-infra`
 - `docker compose up -d --build` в репозитории `money-flow-infra`
 
+## Где задавать ENV на сервере
+Самый простой вариант: создать файл `.env` в репозитории infra на сервере:
+- путь: `$HOME/apps/money-flow-infra/.env`
+
+Минимально нужные переменные:
+- `APP_API_KEY=...`
+- `OPENCLAW_API_KEY=...`
+
+Опционально:
+- `CORS_ORIGIN=...`
+- `DB_PATH=...`
+- `BACKUP_DIR=...`
+- `BACKUP_RETENTION_DAYS=...`
+
 ## Важно для OpenClaw
 Для работы OpenClaw Agent API на окружении должно быть задано:
 - `OPENCLAW_API_KEY` (секретный ключ, который будет проверяться по заголовку `x-api-key`)

@@ -278,3 +278,12 @@
     Файлы:
     - `src/migrations/20260213-0002-amount-cents.ts`
     - `test/migrations.spec.ts`
+
+32. Деплой теперь валидирует, что сервис реально поднялся:
+    - после `docker compose up -d --build` в deploy workflow добавлен poll до `GET /api/health`
+    - дальше проверяется `GET /api/ready` (DB ping)
+    - если не поднялось — workflow фейлится и печатает `docker compose logs`
+    - в `docs/deployment.md` добавлено, где хранить `.env` на сервере (`$HOME/apps/money-flow-infra/.env`)
+    Файлы:
+    - `.github/workflows/deploy.yml`
+    - `docs/deployment.md`
