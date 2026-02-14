@@ -21,8 +21,47 @@
 ### GET /health
 Возвращает `{ "status": "ok" }` при валидном ключе.
 
-### GET /categories
+### Категории (CRUD)
+Категории общие для UI и агента.
+
+#### GET /categories
 Возвращает список категорий (для контекста агенту).
+
+#### POST /categories
+Создаёт категорию.
+
+Request:
+```json
+{
+  "name": "Subscriptions",
+  "type": "expense",
+  "color": "#22c55e"
+}
+```
+
+Поля:
+- `name` (обязательно)
+- `type` (optional): `expense | income` (по умолчанию `expense`)
+- `color` (optional): hex `#RRGGBB` (по умолчанию `#3b82f6`)
+
+#### PUT /categories/:id
+Обновляет категорию по `id`.
+
+Request:
+```json
+{
+  "name": "Subscriptions (paid)",
+  "color": "#16a34a"
+}
+```
+
+#### DELETE /categories/:id
+Удаляет категорию по `id`.
+Если в базе есть транзакции/регулярки, которые ссылаются на эту категорию, **сейчас удаление каскадное**:
+- `Transaction.category -> Category` стоит `onDelete: 'CASCADE'` (удалятся транзакции)
+- `RecurringExpense.category -> Category` стоит `onDelete: 'CASCADE'` (удалятся регулярки)
+
+Если тебе надо другое поведение (например запрещать delete если категория используется) — скажи, сделаем.
 
 ### POST /transactions/import
 Импорт/апсерт транзакций батчем.
@@ -47,7 +86,7 @@ Request:
 Поведение:
 - если транзакции с `(source="openclaw", idempotencyKey)` нет: создаём (`created`)
 - если есть: обновляем (`updated`)
-- `categoryName` резолвим в `Category.id`; если категории нет, создаём
+- `categoryName` резолвим в `Category.id`; если категории нет, создаём (с дефолтными `type/color`)
 
 Response:
 ```json

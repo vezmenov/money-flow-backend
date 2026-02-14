@@ -309,4 +309,47 @@ describe('OpenClaw import', () => {
     expect(categories).toHaveLength(1);
     expect(categories[0].name).toBe('Food');
   });
+
+  it('supports categories CRUD via OpenClaw', async () => {
+    const created = await request(app.getHttpServer())
+      .post('/api/openclaw/v1/categories')
+      .set('x-api-key', 'devkey')
+      .send({ name: 'Subscriptions' })
+      .expect(201)
+      .then((r) => r.body as any);
+
+    expect(created.id).toBeDefined();
+    expect(created.name).toBe('Subscriptions');
+    expect(created.type).toBe('expense');
+    expect(created.color).toBe('#3b82f6');
+
+    const updated = await request(app.getHttpServer())
+      .put(`/api/openclaw/v1/categories/${created.id}`)
+      .set('x-api-key', 'devkey')
+      .send({ name: 'Subscriptions (paid)', color: '#16a34a' })
+      .expect(200)
+      .then((r) => r.body as any);
+
+    expect(updated.id).toBe(created.id);
+    expect(updated.name).toBe('Subscriptions (paid)');
+    expect(updated.color).toBe('#16a34a');
+
+    await request(app.getHttpServer())
+      .delete(`/api/openclaw/v1/categories/${created.id}`)
+      .set('x-api-key', 'devkey')
+      .expect(204);
+
+    await request(app.getHttpServer())
+      .delete(`/api/openclaw/v1/categories/${created.id}`)
+      .set('x-api-key', 'devkey')
+      .expect(404);
+  });
+
+  it('validates category color format on OpenClaw create', async () => {
+    await request(app.getHttpServer())
+      .post('/api/openclaw/v1/categories')
+      .set('x-api-key', 'devkey')
+      .send({ name: 'Bad color', color: 'red' })
+      .expect(400);
+  });
 });

@@ -28,7 +28,7 @@ describe('OpenAPI contract (must cover implemented API)', () => {
     const spec = (await SwaggerParser.parse(specPath)) as any;
 
     const paths = Object.keys(spec.paths ?? {});
-    expect(paths).toEqual(expect.arrayContaining(['/health', '/categories']));
+    expect(paths).toEqual(expect.arrayContaining(['/health', '/categories', '/categories/{id}']));
     expect(paths).toEqual(
       expect.arrayContaining(['/transactions/import', '/transactions/{idempotencyKey}']),
     );

@@ -287,3 +287,19 @@
     Файлы:
     - `.github/workflows/deploy.yml`
     - `docs/deployment.md`
+
+33. Расширен OpenClaw Agent API (v1): добавлен CRUD категорий (create/update/delete), чтобы агент мог управлять категориями через `OPENCLAW_API_KEY`:
+    - `POST /api/openclaw/v1/categories`
+    - `PUT /api/openclaw/v1/categories/:id`
+    - `DELETE /api/openclaw/v1/categories/:id`
+    Также обновлены:
+    - агентская документация (`docs/openclaw-agent-api.md`)
+    - OpenAPI спека (`openapi.openclaw.yaml`)
+    - e2e тесты (OpenClaw категории CRUD + openapi-contract)
+    Файлы:
+    - `src/openclaw/openclaw.module.ts`
+    - `src/openclaw/openclaw.controller.ts`
+    - `openapi.openclaw.yaml`
+    - `docs/openclaw-agent-api.md`
+    - `test/openclaw-import.e2e.spec.ts`
+    - `test/openapi-contract.spec.ts`

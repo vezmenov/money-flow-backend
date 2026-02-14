@@ -6,10 +6,14 @@ import {
   HttpCode,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { CategoriesService } from '../categories/categories.service';
 import { Category } from '../categories/category.entity';
+import { CreateCategoryDto } from '../categories/dto/create-category.dto';
+import { UpdateCategoryDto } from '../categories/dto/update-category.dto';
 import { CreateRecurringExpenseDto } from '../recurring-expenses/dto/create-recurring-expense.dto';
 import { ListRecurringExpensesQueryDto } from '../recurring-expenses/dto/list-recurring-expenses.dto';
 import { RecurringExpense } from '../recurring-expenses/recurring-expense.entity';
@@ -27,6 +31,7 @@ import { OpenClawImportResult, OpenClawService } from './openclaw.service';
 export class OpenClawController {
   constructor(
     private readonly openClawService: OpenClawService,
+    private readonly categoriesService: CategoriesService,
     private readonly recurringExpensesService: RecurringExpensesService,
   ) {}
 
@@ -38,6 +43,25 @@ export class OpenClawController {
   @Get('categories')
   async listCategories(): Promise<Category[]> {
     return this.openClawService.listCategories();
+  }
+
+  @Post('categories')
+  async createCategory(@Body() payload: CreateCategoryDto): Promise<Category> {
+    return this.categoriesService.create(payload);
+  }
+
+  @Put('categories/:id')
+  async updateCategory(
+    @Param('id') id: string,
+    @Body() payload: UpdateCategoryDto,
+  ): Promise<Category> {
+    return this.categoriesService.update(id, payload);
+  }
+
+  @Delete('categories/:id')
+  @HttpCode(204)
+  async removeCategory(@Param('id') id: string): Promise<void> {
+    return this.categoriesService.remove(id);
   }
 
   @Post('transactions/import')
