@@ -266,3 +266,15 @@
     - `test/app-api-key.guard.e2e.spec.ts`
     - `test/job-locks.spec.ts`
     - `test/money.spec.ts`
+
+31. Починен старт в проде при “грязной” SQLite (synchronize:true исторически мог дать другой schema):
+    - миграция `amount-cents` теперь не предполагает строго наличие `"amount"`/`"source"`/`"idempotencyKey"`:
+      - поддерживает уже существующий `amountCents`
+      - поддерживает исторический `externalId` (маппится в `idempotencyKey`)
+    - добавлен smoke-тест, который прогоняет миграции на:
+      - пустой БД
+      - “старой” схеме без `source/idempotencyKey`
+      - схеме уже с `amountCents`
+    Файлы:
+    - `src/migrations/20260213-0002-amount-cents.ts`
+    - `test/migrations.spec.ts`

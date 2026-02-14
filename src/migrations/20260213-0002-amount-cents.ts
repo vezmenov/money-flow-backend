@@ -11,6 +11,7 @@ export class AmountCents1770940800002 implements MigrationInterface {
 
     // Transactions: amount(decimal) -> amountCents(integer)
     await queryRunner.query(`ALTER TABLE "transactions" RENAME TO "transactions_old"`);
+    const txCols = await getTableColumns(queryRunner, 'transactions_old');
     await queryRunner.query(`
       CREATE TABLE "transactions" (
         "id" varchar PRIMARY KEY NOT NULL,
@@ -23,16 +24,28 @@ export class AmountCents1770940800002 implements MigrationInterface {
         CONSTRAINT "FK_transactions_categoryId" FOREIGN KEY ("categoryId") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
       )
     `);
+
+    const txSourceExpr = txCols.has('source') ? `"source"` : `'manual'`;
+    const txIdempotencyExpr = txCols.has('idempotencyKey')
+      ? `"idempotencyKey"`
+      : txCols.has('externalId')
+        ? `"externalId"`
+        : 'NULL';
+    const txAmountCentsExpr = txCols.has('amountCents')
+      ? `CAST("amountCents" AS INTEGER)`
+      : `CAST(ROUND(CAST("amount" AS REAL) * 100.0) AS INTEGER)`;
+    const txDescriptionExpr = txCols.has('description') ? `"description"` : 'NULL';
+
     await queryRunner.query(`
       INSERT INTO "transactions" ("id","source","idempotencyKey","categoryId","amountCents","date","description")
       SELECT
         "id",
-        "source",
-        "idempotencyKey",
+        ${txSourceExpr} AS "source",
+        ${txIdempotencyExpr} AS "idempotencyKey",
         "categoryId",
-        CAST(ROUND(CAST("amount" AS REAL) * 100.0) AS INTEGER) AS "amountCents",
+        ${txAmountCentsExpr} AS "amountCents",
         "date",
-        "description"
+        ${txDescriptionExpr} AS "description"
       FROM "transactions_old"
     `);
     await queryRunner.query(`DROP TABLE "transactions_old"`);
@@ -43,6 +56,7 @@ export class AmountCents1770940800002 implements MigrationInterface {
 
     // Recurring expenses: amount(decimal) -> amountCents(integer)
     await queryRunner.query(`ALTER TABLE "recurring_expenses" RENAME TO "recurring_expenses_old"`);
+    const reCols = await getTableColumns(queryRunner, 'recurring_expenses_old');
     await queryRunner.query(`
       CREATE TABLE "recurring_expenses" (
         "id" varchar PRIMARY KEY NOT NULL,
@@ -54,15 +68,21 @@ export class AmountCents1770940800002 implements MigrationInterface {
         CONSTRAINT "FK_recurring_expenses_categoryId" FOREIGN KEY ("categoryId") REFERENCES "categories" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
       )
     `);
+
+    const reAmountCentsExpr = reCols.has('amountCents')
+      ? `CAST("amountCents" AS INTEGER)`
+      : `CAST(ROUND(CAST("amount" AS REAL) * 100.0) AS INTEGER)`;
+    const reDescriptionExpr = reCols.has('description') ? `"description"` : 'NULL';
+
     await queryRunner.query(`
       INSERT INTO "recurring_expenses" ("id","categoryId","amountCents","dayOfMonth","date","description")
       SELECT
         "id",
         "categoryId",
-        CAST(ROUND(CAST("amount" AS REAL) * 100.0) AS INTEGER) AS "amountCents",
+        ${reAmountCentsExpr} AS "amountCents",
         "dayOfMonth",
         "date",
-        "description"
+        ${reDescriptionExpr} AS "description"
       FROM "recurring_expenses_old"
     `);
     await queryRunner.query(`DROP TABLE "recurring_expenses_old"`);
@@ -153,4 +173,11 @@ async function backupSqlite(queryRunner: QueryRunner, label: string): Promise<vo
     }
     throw e;
   }
+}
+
+async function getTableColumns(queryRunner: QueryRunner, table: string): Promise<Set<string>> {
+  const rows = (await queryRunner.query(`PRAGMA table_info("${table}")`)) as Array<{
+    name?: string;
+  }>;
+  return new Set(rows.map((r) => r.name).filter((n): n is string => Boolean(n)));
 }
