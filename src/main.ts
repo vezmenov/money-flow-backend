@@ -1,19 +1,10 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { requestLoggerMiddleware } from './common/request-logger.middleware';
+import { configureApp } from './bootstrap';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.use(requestLoggerMiddleware);
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
-  app.enableShutdownHooks();
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  configureApp(app);
   await app.listen(process.env.PORT ? Number(process.env.PORT) : 3000);
 }
 

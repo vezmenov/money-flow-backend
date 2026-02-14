@@ -54,6 +54,14 @@ Readiness probe (публично, без ключа):
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
 
+## Security (минимальный hardening)
+- `helmet` включён по умолчанию
+- CORS включается только если задан `CORS_ORIGIN` (можно перечислить несколько через запятую)
+- лимит body:
+  - 1mb глобально
+  - 5mb для `POST /api/openclaw/v1/transactions/import`
+- rate limit: `@nestjs/throttler` (глобально)
+
 ## Важно для регулярных трат
 Парсер регулярных трат запускается внутри backend (schedule job) и создаёт транзакции автоматически.
 

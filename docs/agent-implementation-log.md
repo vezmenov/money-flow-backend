@@ -235,3 +235,16 @@
     - `docs/deployment.md`
     - `test/health-ready.e2e.spec.ts`
     - `test/alerts.service.spec.ts`
+
+29. Усилена базовая безопасность:
+    - `helmet`
+    - CORS включается только если задан `CORS_ORIGIN`
+    - лимит body: 1mb глобально, 5mb для OpenClaw import
+    - rate limit через `@nestjs/throttler` (глобальный guard)
+    Файлы:
+    - `package.json`
+    - `src/app.module.ts`
+    - `src/app.controller.ts`
+    - `src/bootstrap.ts`
+    - `src/main.ts`
+    - `test/body-limits.e2e.spec.ts`
