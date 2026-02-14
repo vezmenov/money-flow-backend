@@ -331,13 +331,25 @@ components:
           format: uuid
         name:
           type: string
+        type:
+          type: string
+          enum: [expense, income]
+        color:
+          type: string
       required:
         - id
         - name
+        - type
+        - color
     CreateCategory:
       type: object
       properties:
         name:
+          type: string
+        type:
+          type: string
+          enum: [expense, income]
+        color:
           type: string
       required:
         - name
@@ -345,6 +357,11 @@ components:
       type: object
       properties:
         name:
+          type: string
+        type:
+          type: string
+          enum: [expense, income]
+        color:
           type: string
     Transaction:
       type: object
